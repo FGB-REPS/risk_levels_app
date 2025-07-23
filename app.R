@@ -6,6 +6,8 @@
 library(shiny)
 library(bslib)
 library(tidyverse)
+library(shiny.destroy)
+
 
 #load data 
 
@@ -45,31 +47,75 @@ source("helper_fxs.R")
 ui <- page_sidebar(
   title = "Data risk levels",
   sidebar = sidebar(
-    # adjust font size of choice options for genDataType
-    tags$style("#genDataType input, .checkbox-inline {
-      font-size: 13px;
-      }"
-    ),
-    # select inputs for general data types to narrow down options of specific data types
-    checkboxGroupInput("genDataType", label="Select general type(s) of data",
-                  choices = c("Show all options", "Administrative data", "Location data", "Audiovisual data", "Textual data", "Experimental/lab data",
-                "Neuroimaging data", "Questionnaire data", "Sociodemographic data", "Economic/political data",
-                "Educational data", "Physical characteristics/medical data", "Biological/genetic data"), inline = TRUE),
-    # select inputs for specific data types to go on x-axis
-    selectInput("dataType", label="Select specific type(s) of data",
-    choices = rskDatTyp$ShortDescription, multiple = TRUE, selectize = TRUE),
+    accordion(
+      # adjust font size of choice options for genDataType
+      tags$style("#genDataType input, .checkbox-inline {
+        font-size: 13px;
+        }"
+      ),
+      accordion_panel(
+        "Data types",
+        # select inputs for general data types to narrow down options of specific data types
+        checkboxGroupInput("genDataType", 
+                           label = span("Select general type(s) of data (optional)",
+                                          span(
+                                            tooltip(
+                                              bsicons::bs_icon("info-circle"),
+                                              "You may select one or more of the following general data types in 
+                                              order to filter the choices shown when selecting specific types of data"
+                                                )
+                                              )
+                                        ),
+                           choices = c("Show all options", "Administrative data", "Location data", 
+                                       "Audiovisual data", "Textual data", "Experimental/lab data",
+                                       "Neuroimaging data", "Questionnaire data", "Sociodemographic data", "Economic/political data",
+                                       "Educational data", "Physical characteristics/medical data", "Biological/genetic data"), inline = TRUE),
+        # select inputs for specific data types to go on x-axis
+        selectInput("dataType", 
+                    label = span("Select specific type(s) of data",
+                                 span(
+                                   tooltip(
+                                     bsicons::bs_icon("info-circle"),
+                                     "Select all of the types of data you wish to assess in the current risk analysis"
+                                    )
+                                  )
+                                 ),
+                    choices = rskDatTyp$ShortDescription, multiple = TRUE, selectize = TRUE)
+      ),
+    
     # adjust font size of choice options for adultChild
     tags$style("#adultChild input, .checkbox {
       font-size: 13px;
       }"
     ),
-    # select inputs for whether participants are adults or children
-    checkboxGroupInput("adultChild", "Select participant age group",
-                       choices = c("Adult participants", "Children participants")),
-    # select inputs for vulnerability of participants on y-axis
-    selectInput("particType", label="Select type(s) of research participants",
-    choices = rskResPart$ShortDescription, multiple = TRUE, selectize = TRUE)
-
+    accordion_panel(
+      "Participant types",
+      # select inputs for whether participants are adults or children
+      checkboxGroupInput("adultChild", 
+                         label = span("Select participant age group (optional)",
+                                      span(
+                                        tooltip(
+                                          bsicons::bs_icon("info-circle"),
+                                          "You may select the age grouping of the participants in order to 
+                                          filter the choices shown when selecting the specific participant type(s)"
+                                        )
+                                      )),
+                         choices = c("Adult participants", "Children participants")),
+      # select inputs for vulnerability of participants on y-axis
+      selectInput("particType", 
+                  label = span("Select type(s) of research participants",
+                               span(
+                                 tooltip(
+                                   bsicons::bs_icon("info-circle"),
+                                   "Select all of the participant types you wish to assess in the current risk analysis"
+                                 )
+                               )),
+                  choices = rskResPart$ShortDescription, multiple = TRUE, selectize = TRUE)
+      )
+    ),
+    actionButton("view", "View results"),
+    actionButton("reset", "Clear all")
+    
   ),
   card(plotOutput("XYplot")),
   card(textOutput("text"))
@@ -89,7 +135,7 @@ server <- function(input, output, session) {
     updateSelectInput(inputId = "dataType", choices = choices)
   })
   
-  maxX <- reactive({
+  maxX <- eventReactive(input$view, {
     req(input$dataType)
     
     df <- rskDatTyp %>% filter(ShortDescription %in% input$dataType) 
@@ -112,8 +158,9 @@ server <- function(input, output, session) {
     updateSelectInput(inputId = "particType", choices = choices)
   })
   
-  maxY <- reactive({
+  maxY <- eventReactive(input$view, {
     req(input$particType)
+    
     rskResPart %>% filter(ShortDescription %in% input$particType) %>%
       summarise(maxY = max(Lvl))
   })
@@ -124,10 +171,9 @@ server <- function(input, output, session) {
     cbind(maxX(), maxY())
   })
   
-  
+
   
   output$XYplot <- renderPlot({
-    
     ggplot(xyPair(), aes(x = maxX, y = maxY)) +
       geom_point(size = 10) +
       xlim(1,5) +
@@ -143,7 +189,17 @@ server <- function(input, output, session) {
     paste("Data risk level is", maxX(), "and participant vulnerability level is", maxY())
   }
     
+  )
+  
+  observeEvent(input$reset, {
+    #when actionButton reset is clicked clear all inputs
+    updateSelectInput(inputId = "genDataType", selected=character(0))
+    updateSelectInput(inputId = "dataType", selected=character(0))
+    updateSelectInput(inputId = "adultChild", selected=character(0))
+    updateSelectInput(inputId = "particType", selected=character(0))
+  }
   ) 
+  
   
 }
 
