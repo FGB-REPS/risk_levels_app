@@ -6,7 +6,7 @@
 library(shiny)
 library(bslib)
 library(tidyverse)
-library(shiny.destroy)
+
 
 
 #load data 
@@ -45,6 +45,7 @@ source("helper_fxs.R")
 
 # Define UI ----
 ui <- page_sidebar(
+  theme = bs_theme(bootswatch = "cerulean"),
   title = "Data risk levels",
   sidebar = sidebar(
     accordion(
@@ -80,7 +81,10 @@ ui <- page_sidebar(
                                     )
                                   )
                                  ),
-                    choices = rskDatTyp$ShortDescription, multiple = TRUE, selectize = TRUE)
+                    choices = rskDatTyp$ShortDescription, multiple = TRUE, selectize = TRUE),
+        #create button to clear data type inputs
+        actionButton("dataClear", "Clear inputs", class="btn-primary")
+        
       ),
     
     # adjust font size of choice options for adultChild
@@ -110,11 +114,13 @@ ui <- page_sidebar(
                                    "Select all of the participant types you wish to assess in the current risk analysis"
                                  )
                                )),
-                  choices = rskResPart$ShortDescription, multiple = TRUE, selectize = TRUE)
+                  choices = rskResPart$ShortDescription, multiple = TRUE, selectize = TRUE),
+      #create button to clear participant type inputs
+      actionButton("particClear", "Clear inputs", class="btn-primary")
       )
     ),
-    actionButton("view", "View results"),
-    actionButton("reset", "Clear all")
+    actionButton("view", "View results", class="btn-primary"),
+    actionButton("reset", "Clear all", class="btn-primary")
     
   ),
   card(plotOutput("XYplot")),
@@ -123,6 +129,11 @@ ui <- page_sidebar(
 
 # Define server logic ----
 server <- function(input, output, session) {
+  
+  #create a reactive Value reset$clear that can be used in observeEvents for clearing all inputs and outputs
+  # will not be needed until the observeEvent actions for the view and reset buttons
+  
+  reset <- reactiveValues(clear = NA)
   
   genDatSubset <- reactive({
     req(input$genDataType)
@@ -165,7 +176,7 @@ server <- function(input, output, session) {
       summarise(maxY = max(Lvl))
   })
   
-  
+
   
   xyPair <- reactive({
     cbind(maxX(), maxY())
@@ -173,7 +184,43 @@ server <- function(input, output, session) {
   
 
   
+  observeEvent(input$view, {
+    # when the action button view is pressed the event reactives to produce maxX and maxY occur
+    # this action also causes the reactive Value reset$clear to become 1 (and therefore not NA)
+    reset$clear <- 1
+  })
+  
+  observeEvent(input$dataClear, {
+    # clear data inputs upon click
+    updateSelectInput(inputId = "genDataType", selected=character(0))
+    updateSelectInput(inputId = "dataType", selected=character(0))
+  }
+  )
+  
+  observeEvent(input$particClear, {
+    # clear participant inputs upon click
+    updateSelectInput(inputId = "adultChild", selected=character(0))
+    updateSelectInput(inputId = "particType", selected=character(0))
+  }
+  )
+  
+  observeEvent(input$reset, {
+    #when actionButton reset is clicked all inputes are cleared and reactive value reset$clear is
+    # returned to NA
+    updateSelectInput(inputId = "genDataType", selected=character(0))
+    updateSelectInput(inputId = "dataType", selected=character(0))
+    updateSelectInput(inputId = "adultChild", selected=character(0))
+    updateSelectInput(inputId = "particType", selected=character(0))
+    reset$clear <- NA
+    
+  }
+  ) 
+  
   output$XYplot <- renderPlot({
+    # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
+    # then no output will be returned. If anything else, the plot will be returned
+    if (is.na(reset$clear)) return()
+    
     ggplot(xyPair(), aes(x = maxX, y = maxY)) +
       geom_point(size = 10) +
       xlim(1,5) +
@@ -183,23 +230,25 @@ server <- function(input, output, session) {
       theme(axis.text=element_text(size=20),
             axis.title=element_text(size=24,face="bold"))
     
+    
   })
   
   output$text <- renderText({
+    # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
+    # then no output will be returned. If anything else, the plot will be returned
+    if (is.na(reset$clear)) return()
+    
     paste("Data risk level is", maxX(), "and participant vulnerability level is", maxY())
   }
-    
+  
   )
   
-  observeEvent(input$reset, {
-    #when actionButton reset is clicked clear all inputs
-    updateSelectInput(inputId = "genDataType", selected=character(0))
-    updateSelectInput(inputId = "dataType", selected=character(0))
-    updateSelectInput(inputId = "adultChild", selected=character(0))
-    updateSelectInput(inputId = "particType", selected=character(0))
-  }
-  ) 
   
+  
+
+  
+  
+
   
 }
 
