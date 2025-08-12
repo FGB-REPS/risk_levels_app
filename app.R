@@ -235,31 +235,9 @@ ui <- page_sidebar(
 
 # Define server logic ----
 server <- function(input, output, session) {
-  
-  # render instructions.Rmd to md and convert to an output that can be presented in instructions panel on UI
-  # this doesn't necessarily need to be done in the server unless the goal is for the md to be reactive
-  # this will matter more for the recommendations panel
 
   
-  output$instructions <- renderUI({
-    includeMarkdown(render("mdFiles/instructions.Rmd", 
-                           output_file = 'instructions', 
-                           output_dir ='mdFiles', 
-                           quiet = TRUE))
-  })
-  
-  
-  # add validation for required fields (only required fields are dataType and particType)
-  
-  iv <- InputValidator$new()
-  iv$add_rule("dataType", sv_required())
-  iv$add_rule("particType", sv_required())
-
-  
-  #create a reactive Value reset$clear that can be used in observeEvents for clearing all inputs and outputs
-  # will not be needed until the observeEvent actions for the view and reset buttons
-  
-  reset <- reactiveValues(clear = NA)
+  # create reactive from genDataType that alters which choices are shown in dataType input section
   
   choicesDat <- reactive({
     req(input$genDataType)
@@ -268,10 +246,15 @@ server <- function(input, output, session) {
     genDatSubset$ShortDescription
   })
   
+  # use reactive to update choices available in dataType
   
   observe({
       updateSelectInput(inputId = "dataType", choices = sort(choicesDat()), selected = input$dataType)
   })
+  
+  # calculate the maximum value for the x-axis (re-identification risk)
+  # create reactive maxX to represent this max value
+  # reactive below uses function from helper_fxs.R script
   
   maxX <- reactive({
     req(input$dataType)
@@ -284,6 +267,8 @@ server <- function(input, output, session) {
     
   })
   
+  # create reactive from adultChile that alters which choices are shown in particType input section
+  
   choicesPart <- reactive({
     req(input$adultChild)
     partTypes <- str_remove(input$adultChild, " participants")
@@ -292,9 +277,14 @@ server <- function(input, output, session) {
     particSubset$ShortDescription
   })
   
+  # use reactive to update choices available in particType
+  
   observe( {
     updateSelectInput(session, inputId = "particType", choices = sort(choicesPart()), selected = input$particType)
   })
+  
+  # calculate the maximum value for the y-axis (vulnerability risk)
+  # create reactive maxY to represent this max value
   
   maxY <- reactive({
     req(input$particType)
@@ -303,9 +293,8 @@ server <- function(input, output, session) {
       summarise(maxY = max(Lvl))
   })
   
-  # auto-adjust sensitLvl default input to "Yes" when maxY > 3.0
+  # auto-adjust sensitLvl from default input of "No" to "Yes" when maxY > 3.0
   # user can still reset back to "No" if desired
-
   
   observeEvent(input$particType, {
     if (maxY() > 3.0) {
@@ -316,13 +305,13 @@ server <- function(input, output, session) {
   }
   ) 
 
-  # create a basic XY pair of maxX and maxY to plot with ggplot
+  # create a basic XY pair reactive from maxX and maxY reactives to use for output plot with ggplot
   
   xyPair <- reactive({
     cbind(maxX(), maxY())
   })
   
-  # define colour coded risk categorizations
+  # capture the input from sensitLvl as reactive sensitLvl() so that it can be used in determining risk level categorizations
   
   sensitLvl <- reactive({
     req(input$sensitLvl)
@@ -330,9 +319,10 @@ server <- function(input, output, session) {
     input$sensitLvl
   })
   
-  # create a reactive that detects if green data are present
-  # (if low enough risk, but green data present, will be assigned
-  # green instead of blue)
+
+  # create reactive grnDatSum() that detects if green data are present
+  # if risks in xyPair are low, but green data is present, rskCateg will be assigned
+  # as green instead of blue
   
   grnDatSum <- reactive({
     req(input$dataType)
@@ -342,9 +332,10 @@ server <- function(input, output, session) {
     
   })
   
-  # determine color of risk category
+  # determine color of risk category as reactive rskCateg()
   
-  rskCateg <- reactive({
+  rskCateg <- eventReactive(input$view, {
+    
     if (maxX() >= 3.9 & maxY() >= 2.2 & sensitLvl() == "Yes") {
       return("RED")
     } 
@@ -403,7 +394,7 @@ server <- function(input, output, session) {
   } 
   )
   
-  # create reactive based on color category to plug into plot output
+  # create reactive based on color category called colorCat() to use in plot output
   
   colorCat <- reactive({
     if (rskCateg() == "RED") {
@@ -424,6 +415,9 @@ server <- function(input, output, session) {
   })
 
   
+  ### ACTION BUTTONS
+  
+  # run Event that selects all general data types (for input field genDataType) if action button selAllGenDat is clicked
   
   observeEvent(input$selAllGenDat, {
     # select all general data types
@@ -432,60 +426,85 @@ server <- function(input, output, session) {
                                                           "Neuroimaging data", "Questionnaire data", "Sociodemographic data", 
                                                           "Economic/political data","Educational data", 
                                                           "Physical characteristics/medical data", "Biological/genetic data"))
-    shinyjs::hide(id = "selAllGenDat")
-    shinyjs::show(id = "deselAllGenDat")
+    shinyjs::hide(id = "selAllGenDat") # hide selAllGenDat action button
+    shinyjs::show(id = "deselAllGenDat") # reveal deselAllGenDat action button
     }
   )
+  
+  # run Event that deselects all general data types (for input field genDataType) if action button deselAllGenDat is clicked
   
   observeEvent(input$deselAllGenDat, {
     # deselect all data processing activities
     updateSelectInput(inputId = "genDataType", selected=character(0))
-    shinyjs::hide(id = "deselAllGenDat")
-    shinyjs::show(id = "selAllGenDat")
+    shinyjs::hide(id = "deselAllGenDat") # hide deselAllGenDat action button
+    shinyjs::show(id = "selAllGenDat") # reveal selAllGenDat action button
   }
   )
+  
+  # run event that deselects all data processing activities (from input field datActiv) if action button deselAllActiv is clicked
+  # default is set to all activities being selected on load
   
   observeEvent(input$deselAllActiv, {
     # deselect all data processing activities
     updateSelectInput(inputId = "datActiv", selected=character(0))
-    shinyjs::hide(id = "deselAllActiv")
-    shinyjs::show(id = "selAllActiv")
+    shinyjs::hide(id = "deselAllActiv") # hide deselAllActiv action button
+    shinyjs::show(id = "selAllActiv") # reveal selAllActiv action button
   }
   )
+  
+  # run event that selects all data processing activities (from input field datActiv) if action button selAllActiv is clicked
   
   observeEvent(input$selAllActiv, {
     # select all data processing activities
     updateSelectInput(inputId = "datActiv", selected=c("storage","transfer","students","archiving","reuse"))
-    shinyjs::hide(id = "selAllActiv")
-    shinyjs::show(id = "deselAllActiv")
+    shinyjs::hide(id = "selAllActiv") # hide selAllActiv action button
+    shinyjs::show(id = "deselAllActiv") # reveal deselAllActiv action button
   }
   )
   
+  # add validation for required fields (only required fields are dataType and particType; sensitLvl is always either yes or no)
+  
+  iv <- InputValidator$new()
+  iv$add_rule("dataType", sv_required())
+  iv$add_rule("particType", sv_required())
+  
+  
+  #create a reactive Value reset$clear that can be used in observeEvents for clearing all inputs and outputs
+  # will not be needed until the observeEvent actions for the view and reset buttons
+  
+  reset <- reactiveValues(clear = NA)
+  
+  # create event for action button "view" so that input validation for dataType and particType is activated
+  
   observeEvent(input$view, {
-    # when the action button view is pressed the event reactives to produce maxX and maxY occur
-    # input validation for these fields is only enable upon clicking view
+    # input validation for these fields is only enabled upon clicking view
     iv$enable()
     # this action also causes the reactive Value reset$clear to become 1 (and therefore not NA)
     reset$clear <- 1
   })
   
+  # clear data inputs upon click on action button dataClear
+  
   observeEvent(input$dataClear, {
-    # clear data inputs upon click
     updateSelectInput(inputId = "genDataType", selected=character(0))
     updateSelectInput(inputId = "dataType", selected=character(0))
   }
   )
   
+  # clear participant inputs upon click on action. button particClear
+  
   observeEvent(input$particClear, {
-    # clear participant inputs upon click
     updateSelectInput(inputId = "adultChild", selected=character(0))
     updateSelectInput(inputId = "particType", selected=character(0))
   }
   )
   
+  
+  # reset all values when actionButton reset is clicked; all inputs are cleared (except sensitLvl & datActiv which return to default) 
+  # and reactive value reset$clear is
+  # returned to NA
+  
   observeEvent(input$reset, {
-    #when actionButton reset is clicked all inputs are cleared (except sensitLvl & datActiv return to default) and reactive value reset$clear is
-    # returned to NA
     updateSelectInput(inputId = "genDataType", selected=character(0))
     updateSelectInput(inputId = "dataType", selected=character(0))
     updateSelectInput(inputId = "adultChild", selected=character(0))
@@ -496,6 +515,11 @@ server <- function(input, output, session) {
     
   }
   ) 
+  
+  
+  #### OUTPUTS
+  
+  # plot output of overall results
   
   output$XYplot <- renderPlot({
     # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
@@ -521,7 +545,7 @@ server <- function(input, output, session) {
   })
   
   
- 
+ # render basic text explaining risk category assigned to user
   
   
   output$text <- renderText({
@@ -537,7 +561,10 @@ server <- function(input, output, session) {
   
   )
   
-  # create a reactive that identifies which data processing activities were chosen
+  
+  # make output for recommendations text on the second tab of UI
+  
+  # first create a reactive that identifies which data processing activities were chosen by user
   
   datProc <- eventReactive(input$view, {
     req(input$datActiv)
@@ -546,7 +573,7 @@ server <- function(input, output, session) {
     
   })
   
-  # recommendations text
+  # based on datProc as well as rskCateg calculations, concat recommendations text and render into UI
 
   
   output$recommendations <- renderUI({
@@ -608,6 +635,16 @@ server <- function(input, output, session) {
  # }
   #)
 
+  
+  # render instructions.Rmd to md and convert to an output that can be presented in the "How to use this tool" tab of the UI
+  
+  output$instructions <- renderUI({
+    includeMarkdown(render("mdFiles/instructions.Rmd", 
+                           output_file = 'instructions', 
+                           output_dir ='mdFiles', 
+                           quiet = TRUE))
+  })
+  
   
 }
 
