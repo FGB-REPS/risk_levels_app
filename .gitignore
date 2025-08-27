@@ -1,6 +1,7 @@
-.Rproj.user
-.Rhistory
-.Ruserdata
+*.Rproj.user
+*.Rhistory
+*.Ruserdata
+*.Rproj
 
 
 mdFiles/*.html
