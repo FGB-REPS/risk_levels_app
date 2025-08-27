@@ -1,0 +1,15 @@
+
+
+# Reusing blue data after research
+
+*See the definition of [data reuse](https://fgb-rdm.nl/rdm/definitions/Definitions.html#reusedata){target="_blank"}. Also, see the [types of data publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publishingdata){target="_blank"} as these inform how reuse may be carried out.*
+
+-   Blue data do not require consent from participants for reuse by the current research team nor by third parties because blue data are fully anonymous/anonymized
+    -   Although the GDPR does not apply to blue data, it is a good and ethical practice to inform your participants that the anonymous/anonymized data from the research will be made public for reuse
+-   Blue data may be openly published for reuse by any interested parties, however, you must still [license the data](https://creativecommons.org/chooser/){target="_blank"} because:
+    -   Without a license, the data cannot legally be used, even if the data are publicly available
+    -   You may want to restrict the reuse of the data to certain interest groups. For example, if you don't want the data reused for commercial purposes, you should select a [non-commercial license](https://creativecommons.org/licenses/by-nc/4.0/deed.en){target="_blank"}
+
+------------------------------------------------------------------------
+
+<br>

@@ -1,0 +1,35 @@
+
+
+## Descriptions and examples of specific data types
+
+The options for the question "Select specific type(s) of data" are kept short for ease of use, but if you are not sure whether the answer option describes your data you can find a more detailed description of the specific data types below. Additionally, the table below shows how the specific types of data are categorized within the "general" data types:
+
+```{r echo = FALSE}
+
+datTabl <- rskDatTyp %>% select(ShortDescription, LongDescription, GenDataType) %>%
+        arrange(ShortDescription) %>%
+        mutate(GenDataType = str_remove_all(GenDataType, ";Show all options")) %>%
+        mutate(GenDataType = str_replace_all(GenDataType, ";", "; ")) %>%
+        rename("Short Description" = ShortDescription, "Long Description" = LongDescription, "General Data Type" = GenDataType)
+
+kable(datTabl, format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+   scroll_box(height = "600px")
+
+```
+
+<br>
+<br>
+
+## Risk classification examples
+
+For more information on how to interpret and understand the data risk classification categories, review the privacy risk categorization table below or see the [full Privacy Risks page](https://fgb-rdm.nl/Security/PrivacyRisks.html){target="_blank"}:
+
+
+<iframe id="s-lg-widget-frame-x" width="80%" height="50%" src="https://fgb-rdm.nl/Security/PrivacyRisks.html#privRskCat" ></iframe>
+
+
+<br>
+<br>
+<br>
+<br>

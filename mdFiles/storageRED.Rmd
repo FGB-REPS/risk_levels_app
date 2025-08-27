@@ -1,0 +1,20 @@
+
+
+# Storage of red data
+
+*Detailed information on storage can be found on the [secure storage page](https://fgb-rdm.nl/Security/Storage.html){target="_blank"}.*
+
+-   A custom storage solution may need to be developed for red data
+    -   If your data are red, and you cannot see any way to reduce the risks through de-identification or data segregation, contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) for advice
+-   [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"} is the best storage option for red data, but you will need IT Security confirmation that you can use it for your case
+    -   Contact the [RDM support desk](mailto:rdm@vu.nl) to be brought into contact with IT Security
+    -   The red data stored on YODA will also need to be [encrypted](https://fgb-rdm.nl/Security/Encryption.html#fle){target="_blank"}
+    -   Also ensure that you follow the additional [security requirements](https://fgb-rdm.nl/rdm/tools/YODAInstructionsFGB.html#protection){target="_blank"} for YODA and red data
+-   If YODA is not feasible for the storage of your red data, it ***may*** be possible to use Research Drive or SciStor but ***only*** in discussion with IT and [RDM support](mailto:rdm@vu.nl)
+    -   Review the [pros & cons](https://fgb-rdm.nl/Security/Storage.html#Faculty_Storage_Recommendations_for_Research_Data){target="_blank"} and specifications of [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"} and [SciStor](https://rdm.vu.nl/topics/scistor.html){target="_blank"}. If **Research Drive** meets your needs, contact the [RDM support desk](rdm@vu.nl) for further assistance; if **SciStor** meets your needs, contact [IT for Research](itvo.ucit@vu.nl) for further assistance
+        -   If Research Drive is deemed appropriate for the storage of your red data, ensure that you review the [faculty guidance on the secure use of Research Drive](https://fgb-rdm.nl/Security/Storage.html#security){target="_blank"}
+-   Teams/SharePoint is [not generally recommended](https://fgb-rdm.nl/Security/Storage.html#Faculty_Storage_Recommendations_for_Research_Data){target="_blank"} for the storage of research data, regardless of the privacy risk, but if you think it is your only feasible option, please contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) for further advice before using it for red data
+
+------------------------------------------------------------------------
+
+<br>

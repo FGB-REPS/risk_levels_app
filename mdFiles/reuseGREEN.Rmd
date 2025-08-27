@@ -1,0 +1,30 @@
+
+
+# Reusing green data after research
+
+*See the definition of [data reuse](https://fgb-rdm.nl/rdm/definitions/Definitions.html#reusedata){target="_blank"}. Also, see the [types of data publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publishingdata){target="_blank"} as these inform how reuse may be carried out.*
+
+Green data are low-risk, but still considered personal data under the GDPR. This means that consent is still a requirement for reuse, however, the restrictions on the reuse of green data are much lower.
+
+## Reuse by current research team
+
+-   Participants must be informed during the consent process that the green data may be reused for purposes that are in-line with the current research project
+-   For new research purposes by the current research team, the participants should be indirectly informed via a publicly available privacy statement (published, for example, on [OSF](https://osf.io/){target="_blank"}), however, you should ensure that participants are aware of where they can find this information during the initial consent processes
+    -   NB: if the green data is not linked to a participant's [directly identifying information](https://fgb-rdm.nl/rdm/definitions/Definitions.html#directID){target="_blank"}, there are no means by which to identify a specific research subject's record, meaning it is not possible to identify specific records to exclude if a research subject objects to reuse for new purposes. In such a case, make sure participants are aware of this during the initial consent process. If, however, the green data is linked to a [key file](https://fgb-rdm.nl/rdm/definitions/Definitions.html#keyfile){target="_blank"}, the publicly available privacy statement must include the contact information of the research team so that they can ask questions and/or change their consent status
+
+## Reuse by other parties
+
+-   Consent for reuse of green data by third parties must still be obtained from participants, however, the green data *may only* be shared publicly as long as *only* the green data are published openly (i.e. no links to any [key files](https://fgb-rdm.nl/rdm/definitions/Definitions.html#keyfile){target="_blank"} nor any higher risk data); participants must also be informed during the initial consent process that specific data from the research (with the data in question listed) will be publicly available after the research is concluded.
+    -   Consent can either be obtained as part of the participant's overall participation in the study or as a separate consent request
+        -   If consent for reuse of green data is a requirement of overall participation, make sure participants are fully aware of this. For your own purposes, understand that this route may result in some participants opting to not participate in your study altogether
+        -   If consent for reuse of green data is a separate consent request, you are responsible for ensuring that only the data for which consent was given is openly published once the research is complete
+-   The openly published green data must be appropriately [licensed](https://creativecommons.org/chooser/){target="_blank"} to ensure that only relevant parties are legally allowed to use the data
+    -   NB: Be aware that licenses only ensure that good faith actors will use the data in-line with the license requirements
+
+## Additional considerations
+
+The procedures described above for reuse of green data are fairly new and require that you have appropriately obtained consent to sharing the green data openly and publicly. If that was not done, it is advisable to follow the guidance on reusing *yellow* data after research. If you wish to review that guidance, click the following button:
+
+------------------------------------------------------------------------
+
+<br>

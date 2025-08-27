@@ -1,0 +1,26 @@
+
+
+# Reusing orange data after research
+
+*See the definition of [data reuse](https://fgb-rdm.nl/rdm/definitions/Definitions.html#reusedata){target="_blank"}. Also, see the [types of data publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publishingdata){target="_blank"} as these inform how reuse may be carried out.*
+
+## Reuse by current research team
+
+-   Consent for reuse of orange data by the current research team, including research that is in-line with the current research project, should always be obtained from participants
+    -   If consent was not obtained, but the new research is in-line with the current research project, you should discuss the issue with the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl) prior to any reuse
+-   If the current research team wishes to reuse the data for new purposes not in-line with the original project, the research participants must be informed about the new purposes and given the opportunity to renew or revoke their consent prior to any reuse
+    -   Participants may be indirectly informed of the new purposes via a publicly available privacy statement (published, for example, on [OSF](https://osf.io/){target="_blank"}), however, you should ensure that participants are aware of where they can find this information during the initial consent processes and the publicly available statement must include contact information so that they can ask questions and/or change their consent status
+
+## Reuse by other parties
+
+-   Always ensure that consent has been obtained from participants for the reuse of orange data by third parties; if the reuse goals are not in-line with the original project, the research participants must be informed about the new purposes and given the opportunity to renew or revoke their consent prior to any reuse
+    -   Participants may be indirectly informed of the new purposes via a publicly available privacy statement (published, for example, on [OSF](https://osf.io/){target="_blank"}), however, you should ensure that participants are aware of where they can find this information during the initial consent processes and the publicly available statement must include contact information so that they can ask questions and/or change their consent status
+-   Access to orange data must only be given after the third party's request has been reviewed and approved, and after all legal agreements are in place to ensure the data will be kept secure
+    -   **Orange data must never be made publicly available for reuse  (i.e. [open data publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publTypes){target="_blank"} of orange data is not allowed)**
+-   Prior to allowing reuse of orange data by third parties:
+    -   Reduce the risks posed by the data that will be shared by [de-identifying](https://fgb-rdm.nl/Security/Deidentification.html){target="_blank"} the data as much as possible prior to sharing; the amount of de-identification possible will depend on the goals of the third party
+    -   Ensure that any data that are shared for reuse, are shared using [secure means](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"}
+
+------------------------------------------------------------------------
+
+<br>

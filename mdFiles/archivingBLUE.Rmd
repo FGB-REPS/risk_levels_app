@@ -1,0 +1,12 @@
+
+
+# Archiving & publishing blue data
+
+*Detailed information on [archiving](https://fgb-rdm.nl/rdm/definitions/Definitions.html#archivingdata){target="_blank"} & [publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publishingdata){target="_blank"} data can be found on the [Summary of the FGB Archiving Guidelines page](https://fgb-rdm.nl/rdm/archiving/ArchivingGuidelinesSummary.html){target="_blank"}.*
+
+-   [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"} is the default archive for blue data, however, you may also use an alternative archive if it better suits your purposes, such as [DataverseNL](https://dataverse.nl/dataverse/vuamsterdam){target="_blank"}
+    -   If you wish to use a different data repository than the options above, you can find more options via [https://www.re3data.org/](https://www.re3data.org/){target="_blank"}
+
+------------------------------------------------------------------------
+
+<br>

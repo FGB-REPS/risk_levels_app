@@ -1,0 +1,13 @@
+
+
+# Storage of blue data
+
+*Detailed information on storage can be found on the [secure storage page](https://fgb-rdm.nl/Security/Storage.html){target="_blank"}.*
+
+-   Blue data can be stored in any location you deem appropriate, however, the faculty recommends using [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"}, [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"}, [SciStor](https://rdm.vu.nl/topics/scistor.html){target="_blank"} or, in some instances, Teams/Sharepoint for storing blue data
+    -   Use [this table](https://fgb-rdm.nl/Security/Storage.html#FGBrecs){target="_blank"} to decide which option will work best for you
+    -   If Teams seems to be the best option for you, contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) for further advice before using it for blue data
+
+------------------------------------------------------------------------
+
+<br>

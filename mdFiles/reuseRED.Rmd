@@ -1,0 +1,30 @@
+
+
+# Reusing red data after research
+
+*See the definition of [data reuse](https://fgb-rdm.nl/rdm/definitions/Definitions.html#reusedata){target="_blank"}. Also, see the [types of data publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publishingdata){target="_blank"} as these inform how reuse may be carried out.*
+
+## Reuse by current research team
+
+-   Consent for reuse of red data by the current research team, including research that is in-line with the current research project, should always be obtained from participants
+    -   If consent was not obtained, but the new research is in-line with the current research project, you should discuss the issue with the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl) prior to any reuse
+-   If the current research team wishes to reuse the data for new purposes not in-line with the original project, the research participants must be directly informed about the new purposes and given the opportunity to renew or revoke their consent prior to any reuse
+    -   If it is not feasible to directly follow-up with the participants to renew their consent, contact the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl) for further guidance prior to any reuse
+
+## Reuse by other parties
+
+-   Reuse of red data by third parties, including for research that is in-line with the current research project, must be carefully considered and in general it is not recommended to allow red data to be reused by third parties
+-   If reuse of red data by third parties is allowed after careful consideration, always ensure that consent has been obtained from participants for this reason and if the reuse goals are not in-line with the original project, the research participants must be directly informed about the new purposes and given the opportunity to renew or revoke their consent prior to any reuse
+    -   If it is not feasible to directly follow-up with the participants to renew their consent, contact the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl) for further guidance prior to any reuse
+-   Access to red data must only be given after the third party's request has been reviewed and approved, and after all legal agreements are in place to ensure the data will be kept secure
+    -   **Red data must never be made publicly available for reuse (i.e. [open data publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publTypes){target="_blank"} of red data is not allowed)**
+-   Prior to allowing reuse of red data by third parties:
+    -   Reduce the risks posed by the data that will be shared by [de-identifying](https://fgb-rdm.nl/Security/Deidentification.html){target="_blank"} the data as much as possible prior to sharing; the amount of de-identification possible will depend on the goals of the third party
+    -   Ensure that any data that are shared for reuse, are shared using [secure means](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"}
+    -   Assess whether alternative means to sharing the data can be used, such as:
+        -   Using federated analyses systems that allow the third party users to analyse the data without directly accessing the data
+        -   Requiring that the third party users analyse the data onsite at the VU under supervision; the users may only leave with their analyses and none of the data
+
+------------------------------------------------------------------------
+
+<br>

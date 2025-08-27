@@ -1,0 +1,16 @@
+
+
+# Sharing red data during research
+
+*Detailed information on sharing data (digital data transfer) can be found on the [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"}.*
+
+**NB**: sharing data in this context refers to sharing with research team members and collaborators during the active research process
+
+-   If you are already using [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"} for storage of red data, then it can be used to transfer red data
+    -   Follow the instructions on the [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"} for red data to ensure the data are securely transferred
+-   If YODA is not already in use, contact the [RDM Support Desk](mailto:rdm@vu.nl) to discuss if there are any other options available to you
+    -   You can also contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) for initial advice, for example, discussing how to reduce the risks posed by the data before investigating data transfer options
+
+------------------------------------------------------------------------
+
+<br>

@@ -1,0 +1,12 @@
+
+
+# Student use of green data
+
+*Detailed information on use of data by students can be found on the [Security for Students page](https://fgb-rdm.nl/Security/SecurityForStudents.html){target="_blank"}. If you will be supervising students who are given access to research data of any risk level, ensure that you have reviewed the general requirements on this page and that your students have read the [Security Basics page](https://fgb-rdm.nl/Security/SecurityBasics.html){target="_blank"}.*
+
+-   You can provide students access to green data via [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"}, [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"}, [SciStor](https://rdm.vu.nl/topics/scistor.html){target="_blank"}, Teams/Sharepoint, [SURFdrive](https://services.vu.nl/esc?id=kb_article&sysparm_article=KB0012728){target="_blank"}, [ZIVVER](https://services.vu.nl/esc?id=kb_article&sysparm_article=KB0012860){target="_blank"} or [SURFFileSender](https://www.surf.nl/en/surffilesender-send-large-files-securely-and-encrypted){target="_blank"}
+    -   Review the storage considerations for green data on the [Security for Students page](https://fgb-rdm.nl/Security/SecurityForStudents.html#storage){target="_blank"} to ensure that your students can safely and securely work with *only* the data they are allowed to access
+
+------------------------------------------------------------------------
+
+<br>

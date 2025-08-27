@@ -1,0 +1,13 @@
+
+
+# Student use of orange data
+
+*Detailed information on use of data by students can be found on the [Security for Students page](https://fgb-rdm.nl/Security/SecurityForStudents.html){target="_blank"}. If you will be supervising students who are given access to research data of any risk level, ensure that you have reviewed the general requirements on this page and that your students have read the [Security Basics page](https://fgb-rdm.nl/Security/SecurityBasics.html){target="_blank"}.*
+
+-   If you are already storing your orange data on [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"}, [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"}, [SciStor](https://rdm.vu.nl/topics/scistor.html){target="_blank"} or Teams/Sharepoint, you can provide access for your student within this storage environment
+    -   Review the storage considerations for orange data on the [Security for Students page](https://fgb-rdm.nl/Security/SecurityForStudents.html#storage){target="_blank"} to ensure that your students can safely and securely work with *only* the data they are allowed to access
+-   If YODA, Research Drive, SciStor or Teams are not feasible for sharing orange data with students, it is possible to use [ZIVVER](https://services.vu.nl/esc?id=kb_article&sysparm_article=KB0012860){target="_blank"} or [SURFFileSender](https://www.surf.nl/en/surffilesender-send-large-files-securely-and-encrypted){target="_blank"}, but ensure that your students also follow the requirements for orange data listed on the [Security for Students page](https://fgb-rdm.nl/Security/SecurityForStudents.html#storage){target="_blank"}
+
+------------------------------------------------------------------------
+
+<br>

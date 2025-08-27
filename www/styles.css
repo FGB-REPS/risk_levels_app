@@ -1,0 +1,35 @@
+/*adjust font size of choice options for input 'genDataType'*/
+#genDataType .checkbox-inline {
+        font-size: 13px;
+        }
+      
+      
+/* adjust font size of choice options for input 'adultChild'*/
+#adultChild .checkbox-inline {
+        font-size: 13px;
+        }
+      
+/* adjust font size of choice options for input 'datActiv' */
+#datActiv .checkbox-inline {
+        font-size: 15px;
+        }
+      
+/*adjust padding for (de)select all action button 'selAllGenDat' and 'deselAllGenDat'*/
+#selAllGenDat.btn-outline-primary, #deselAllGenDat.btn-outline-primary {
+        margin-bottom: 15%;
+        }
+      
+/* set action button default style and style when hovered over */
+
+
+.btn:hover{
+  color: #0059b3;
+  border-color: #0059b3;
+}
+      
+/* adjust width for action button swtchReuseYel */
+#shwYelReus.btn-outline-primary {
+        width: 10%;
+        }
+
+

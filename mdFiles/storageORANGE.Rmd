@@ -1,0 +1,18 @@
+
+
+# Storage of orange data
+
+*Detailed information on storage can be found on the [secure storage page](https://fgb-rdm.nl/Security/Storage.html){target="_blank"}.*
+
+-   [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"} is one of the best storage options for orange data
+    -   Ensure that you follow the additional [security requirements](https://fgb-rdm.nl/rdm/tools/YODAInstructionsFGB.html#protection){target="_blank"} for YODA and orange data
+-   [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"} is also a reasonable option for orange data, with some caveats:
+    -   Orange data stored on Research Drive will also need to be [encrypted](https://fgb-rdm.nl/Security/Encryption.html#fle){target="_blank"}
+    -   Ensure that you follow the additional [faculty guidance on the secure use of Research Drive](https://fgb-rdm.nl/Security/Storage.html#security){target="_blank"} when storing orange data
+-   If neither YODA nor Research Drive are feasible for the storage of your orange data, it *may* be possible to use SciStor but *only* in discussion with [IT for Research](mailto:itvo.ucit@vu.nl)
+    -   Review the [pros & cons](https://fgb-rdm.nl/Security/Storage.html#Faculty_Storage_Recommendations_for_Research_Data){target="_blank"} and specifications of [SciStor](https://rdm.vu.nl/topics/scistor.html){target="_blank"}. If it meets your needs, contact [IT for Research](mailto:itvo.ucit@vu.nl) for further assistance
+-   Teams/SharePoint is [not generally recommended](https://fgb-rdm.nl/Security/Storage.html#Faculty_Storage_Recommendations_for_Research_Data){target="_blank"} for the storage of research data, regardless of the privacy risk, but if you think it is your only feasible option, contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) for further advice before using it for orange data
+
+------------------------------------------------------------------------
+
+<br>

@@ -1,0 +1,16 @@
+
+
+# Sharing blue data during research
+
+*Detailed information on sharing data (digital data transfer) can be found on the [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"}.*
+
+**NB**: sharing data in this context refers to sharing with research team members and collaborators during the active research process
+
+-   There are no specific requirements for sharing blue data, but it is generally advised to use the same measures for blue data as you would for green data
+    -   See [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"} for more information
+-   Always ensure that only the correct recipients will receive the data and that you trust they will protect the data appropriately once they are received
+    -   If you are unsure or need advice on this topic, you can contact the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl)
+
+------------------------------------------------------------------------
+
+<br>

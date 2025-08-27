@@ -1,0 +1,14 @@
+
+
+# Archiving & publishing red data
+
+*Detailed information on [archiving](https://fgb-rdm.nl/rdm/definitions/Definitions.html#archivingdata){target="_blank"} & [publishing](https://fgb-rdm.nl/rdm/definitions/Definitions.html#publishingdata){target="_blank"} data can be found on the [Summary of the FGB Archiving Guidelines page](https://fgb-rdm.nl/rdm/archiving/ArchivingGuidelinesSummary.html){target="_blank"}.*
+
+-   [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"} is the default archive for red data
+    -   Ensure that you review the [additional security considerations](https://fgb-rdm.nl/rdm/tools/YODAInstructionsFGB.html#protection){target="_blank"} for archiving red data on YODA
+    -   Additional guidance for archiving data on YODA, regardless of the risk level is found in the [FGB YODA instructions](https://fgb-rdm.nl/rdm/tools/YODAInstructionsFGB.html#furtherArchiving){target="_blank"}
+-   If YODA is not a feasible archive for your data, contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) as soon as possible to discuss this
+
+------------------------------------------------------------------------
+
+<br>

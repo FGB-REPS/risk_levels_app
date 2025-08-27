@@ -1,0 +1,18 @@
+
+
+# Sharing green data during research
+
+*Detailed information on sharing data (digital data transfer) can be found on the [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"}.*
+
+**NB**: sharing data in this context refers to sharing with research team members and collaborators during the active research process
+
+-   If you are already using [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"}, [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"} or Teams/Sharepoint for the storage of green data, you can also use that storage option to share data digitally
+    -   Follow the instructions on the [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"} for green data and the storage option you are using to ensure the data are securely transferred
+-   [SURFdrive](https://services.vu.nl/esc?id=kb_article&sysparm_article=KB0012728){target="_blank"}, [ZIVVER](https://services.vu.nl/esc?id=kb_article&sysparm_article=KB0012860){target="_blank"}, [SURFFileSender](https://www.surf.nl/en/surffilesender-send-large-files-securely-and-encrypted){target="_blank"} or internal VU e-mail (i.e. from one VU e-mail address to another) may also be used to digitally transfer green data
+    -   More information is available on the [digital data transfer page](https://fgb-rdm.nl/Security/DigitalTransfer.html){target="_blank"} on how to use these tools for digitally sharing green data
+-   Always ensure that only the correct recipients will receive the data and that you trust they will protect the data appropriately once they are received
+    -   If you are unsure or need advice on this topic, you can contact the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl)
+
+------------------------------------------------------------------------
+
+<br>

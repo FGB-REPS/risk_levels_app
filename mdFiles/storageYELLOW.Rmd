@@ -1,0 +1,14 @@
+
+
+# Storage of yellow data
+
+*Detailed information on storage can be found on the [secure storage page](https://fgb-rdm.nl/Security/Storage.html){target="_blank"}.*
+
+-   Yellow data may be stored in [YODA](https://rdm.vu.nl/topics/yoda.html){target="_blank"}, [Research Drive](https://rdm.vu.nl/topics/researchdrive.html){target="_blank"}, [SciStor](https://rdm.vu.nl/topics/scistor.html){target="_blank"} and, in some instances, Teams/Sharepoint
+    -   Use [this table](https://fgb-rdm.nl/Security/Storage.html#FGBrecs){target="_blank"} to decide which option will work best for you
+    -   If Teams seems to be the best option for you, contact the [faculty data stewards](mailto:research.data.fgb@vu.nl) for further advice before using it for yellow data
+-   Ensure that you follow the [security guidance](https://fgb-rdm.nl/Security/Storage.html#Security_Guidance_per_Storage_Solution){target="_blank"} for whichever option you choose
+
+------------------------------------------------------------------------
+
+<br>

@@ -12,6 +12,7 @@ library(shinycssloaders)
 library(markdown)
 library(rmarkdown)
 library(knitr)
+library(kableExtra)
 
 
 
@@ -34,15 +35,13 @@ source("helper_fxs.R")
 # is not super long
 #  > select all of the specific data types used in their study based on
 # the general data types chosen
-#  > have an on-off button for "sensitive research topics"
+#  > have an on-off button for "sensitive research topics / elevated risk of harm"
 
 # - design plot output that places result at the correct X,Y coordinate based on 
 # the re-identification risk posed by data type (i.e. X), as well as any interacting factors
 # that arise from combinations of data types, and the vulnerability risk posed
-# by the research subjects (i.e. Y), with option to toggle sensitive on and off
-# resulting plot should show where the overall risk lands against a colour background
-# to show what colour category is achieved. The background will change if sensitivity
-# is on so that higher risk colour is achieved.
+# by the research subjects (i.e. Y), with option to toggle risk of harm on and off
+# resulting in different risk colour categories that show up on the graph
 
 # UI should also
 # - have space for short text that states the resulting colour code
@@ -55,36 +54,14 @@ source("helper_fxs.R")
 ui <- page_sidebar(
   useShinyjs(),
   theme = bs_theme(bootswatch = "cerulean"),
-  title = "Data risk levels",
+  #  custom CSS
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")  
+  ),
+  title = "Data Risk Classification",
   sidebar = sidebar(
     accordion(
-      # style adjustments first
-      # adjust font size of choice options for input 'genDataType'
-      tags$style("#genDataType .checkbox-inline {
-        font-size: 13px;
-        }"
-      ),
-      # adjust font size of choice options for input 'adultChild'
-      tags$style("#adultChild .checkbox-inline {
-        font-size: 13px;
-        }"
-      ),
-      # adjust font size of choice options for input 'datActiv'
-      tags$style("#datActiv .checkbox-inline {
-        font-size: 15px;
-        }"
-      ),
-      # adjust padding for (de)select all action button 'selAllGenDat' and 'deselAllGenDat'
-      tags$style("#selAllGenDat.btn-outline-primary, #deselAllGenDat.btn-outline-primary {
-        margin-bottom: 15%;
-        }"
-      ),
-      # adjust width for action button swtchReuseYel
-      tags$style("#swtchReuseYel.btn-outline-primary {
-        width: 10%;
-        }"
-      ),
-      open = "Data types", # set first panel to open upon load
+      open = c("Data types", "Participant types", "Risk of harm"), # set first panel to open upon load
       accordion_panel(
         "Data types",
         # select inputs for general data types to narrow down options of specific data types
@@ -118,7 +95,7 @@ ui <- page_sidebar(
                                  ),
                     choices = sort(rskDatTyp$ShortDescription), multiple = TRUE, selectize = TRUE),
         #create button to clear data type inputs
-        actionButton("dataClear", "Clear inputs", class="btn-outline-primary")
+        actionButton("dataClear", "Clear inputs", class="btn btn-outline-primary")
         
       ),
       accordion_panel(
@@ -146,17 +123,18 @@ ui <- page_sidebar(
                                )),
                   choices = sort(rskResPart$ShortDescription), multiple = TRUE, selectize = TRUE),
         #create button to clear participant type inputs
-        actionButton("particClear", "Clear inputs", class="btn-outline-primary")
+        actionButton("particClear", "Clear inputs", class="btn btn-outline-primary")
         ),
         accordion_panel(
-          "Data sensitivity",
-          radioButtons("sensitLvl",
-                   label = span("Is the information within the data about the participants sensitive in nature?",
+          "Risk of harm",
+          radioButtons("harmLvl",
+                   label = span("Does the information contained in the data pose additional risks of harm to the participants?",
                                 span(
                                   tooltip(
                                     bsicons::bs_icon("info-circle"),
-                                    "Select 'yes' if the information could
-                                    be harmful to the research subjects if leaked to the public"
+                                    "Select 'yes' if the risk of harm to the research subjects, should the information be leaked,
+                                    is elevated by the content of the data, in combination with and/or beyond what
+                                    is already known about the research subjects' vulnerability"
                                   )
                                 )),
                    choices= c("No", "Yes"),
@@ -180,7 +158,7 @@ ui <- page_sidebar(
                            choiceNames = list("Storage during current project", 
                                               "Sharing during current project",
                                               "Use by students during current project", 
-                                              "Archiving & publiashing after current project", 
+                                              "Archiving & publishing after current project", 
                                               "Reuse after current project"),
                            choiceValues = list("storage",
                                                "transfer",
@@ -194,16 +172,16 @@ ui <- page_sidebar(
                                         "reuse"),
                            inline = TRUE),
           # create button to select all data processing activities
-          actionButton("deselAllActiv", "Deseelect all", class="btn-outline-primary"),
+          actionButton("deselAllActiv", "Deseelect all", class="btn btn-outline-primary"),
           # create button to deselect all data processing activities
-          shinyjs::hidden(actionButton("selAllActiv", "Select all", class="btn-outline-primary"))
+          shinyjs::hidden(actionButton("selAllActiv", "Select all", class="btn btn-outline-primary"))
         )
     
       ),
     # create button for viewing results once specific data types and participants are selected
-    actionButton("view", "View results", class="btn-primary"),
+    actionButton("view", "View results", class="btn btn-primary"),
     #create button to clear everything and start over
-    actionButton("reset", "Reset", class="btn-outline-primary")
+    actionButton("reset", "Reset", class="btn btn-outline-primary")
     
   ),
   # create panel of output information as well as supplementary instructions
@@ -211,8 +189,8 @@ ui <- page_sidebar(
     # panel for plot output and specific results (colour-categorization and risk level)
     nav_panel(
       "Risk level results",
-      card(plotOutput("XYplot", height = "70%") ),
-      card(textOutput("text") %>% withSpinner(type = getOption("spinner.type", default = 5),
+      card(plotOutput("XYplot", height = "800px") ),
+      card(uiOutput("textResults") %>% withSpinner(type = getOption("spinner.type", default = 5),
                                               color = getOption("spinner.color", default = "#2da4e7")))
     ),
     # panel for specific recommendations on storage, data sharing etc
@@ -220,7 +198,7 @@ ui <- page_sidebar(
       "Risk level recommendations",
       uiOutput("recommendations") %>% withSpinner(type = getOption("spinner.type", default = 5),
                                                   color = getOption("spinner.color", default = "#2da4e7")),
-     # shinyjs::hidden(actionButton("swtchReuseYel", "Switch to yellow data guidance", class="btn-outline-primary")) # not sure if will include this button and action; may add back later
+      shinyjs::hidden(actionButton("shwYelReus", "Show reuse of yellow data", class="btn-outline-primary"))
     ),
     # panel for instructions on how to use the tool (if needed)
     nav_panel(
@@ -229,6 +207,13 @@ ui <- page_sidebar(
         uiOutput("instructions") %>% withSpinner(type = getOption("spinner.type", default = 5),
                                                  color = getOption("spinner.color", default = "#2da4e7"))
 
+    ),
+    # panel for instructions on how to use the tool (if needed)
+    nav_panel(
+      "Additional guidance",
+      uiOutput("datTypTab")  %>% withSpinner(type = getOption("spinner.type", default = 5),
+                                                    color = getOption("spinner.color", default = "#2da4e7"))
+      
     )
   )
 )
@@ -246,10 +231,16 @@ server <- function(input, output, session) {
     genDatSubset$ShortDescription
   })
   
+
   # use reactive to update choices available in dataType
   
   observe({
-      updateSelectInput(inputId = "dataType", choices = sort(choicesDat()), selected = input$dataType)
+      inptGenDat <- input$genDataType
+      if (!is.null(inptGenDat)) {
+        updateSelectInput(inputId = "dataType", choices = sort(choicesDat()), selected = input$dataType)
+      } else {
+        updateSelectInput(inputId = "dataType", choices = sort(rskDatTyp$ShortDescription), selected = input$dataType)
+      }
   })
   
   # calculate the maximum value for the x-axis (re-identification risk)
@@ -279,8 +270,14 @@ server <- function(input, output, session) {
   
   # use reactive to update choices available in particType
   
-  observe( {
-    updateSelectInput(session, inputId = "particType", choices = sort(choicesPart()), selected = input$particType)
+  observe({
+    inptPartTyp <- input$adultChild
+    
+    if(!is.null(inptPartTyp)) {
+      updateSelectInput(session, inputId = "particType", choices = sort(choicesPart()), selected = input$particType)
+    } else {
+      updateSelectInput(session, inputId = "particType", choices = sort(rskResPart$ShortDescription), selected = input$particType)
+    }
   })
   
   # calculate the maximum value for the y-axis (vulnerability risk)
@@ -293,14 +290,14 @@ server <- function(input, output, session) {
       summarise(maxY = max(Lvl))
   })
   
-  # auto-adjust sensitLvl from default input of "No" to "Yes" when maxY > 3.0
+  # auto-adjust harmLvl from default input of "No" to "Yes" when maxY > 3.0
   # user can still reset back to "No" if desired
   
   observeEvent(input$particType, {
     if (maxY() > 3.0) {
-    updateSelectInput(inputId = "sensitLvl", selected = "Yes")
+    updateSelectInput(inputId = "harmLvl", selected = "Yes")
     } else {
-    updateSelectInput(inputId = "sensitLvl", selected = "No")
+    updateSelectInput(inputId = "harmLvl", selected = "No")
       }
   }
   ) 
@@ -311,12 +308,12 @@ server <- function(input, output, session) {
     cbind(maxX(), maxY())
   })
   
-  # capture the input from sensitLvl as reactive sensitLvl() so that it can be used in determining risk level categorizations
+  # capture the input from harmLvl as reactive harmLvl() so that it can be used in determining risk level categorizations
   
-  sensitLvl <- reactive({
-    req(input$sensitLvl)
+  harmLvl <- reactive({
+    req(input$harmLvl)
     
-    input$sensitLvl
+    input$harmLvl
   })
   
 
@@ -334,60 +331,60 @@ server <- function(input, output, session) {
   
   # determine color of risk category as reactive rskCateg()
   
-  rskCateg <- eventReactive(input$view, {
+  rskCateg <- reactive({
     
-    if (maxX() >= 3.9 & maxY() >= 2.2 & sensitLvl() == "Yes") {
+    if (maxX() >= 3.9 & maxY() >= 2.2 & harmLvl() == "Yes") {
       return("RED")
     } 
-    if (maxX() >= 3.9 & maxY() >= 2.2 & sensitLvl() == "No") {
+    if (maxX() >= 3.9 & maxY() >= 2.2 & harmLvl() == "No") {
       return("ORANGE")
     }
-    if (maxX() >= 3.9 & maxY() < 2.2 & (sensitLvl() == "Yes"|sensitLvl() == "No")) {
+    if (maxX() >= 3.9 & maxY() < 2.2 & (harmLvl() == "Yes"|harmLvl() == "No")) {
       return("ORANGE")
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() > 3.0 & sensitLvl() == "Yes") {
+    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() > 3.0 & harmLvl() == "Yes") {
       return("RED")
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() > 3.0 & sensitLvl() == "No") {
+    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() > 3.0 & harmLvl() == "No") {
       return("ORANGE")
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & (maxY() >= 2.2 & maxY() <= 3.0) & sensitLvl() == "Yes") {
+    if ((maxX() >= 3.0 & maxX() <= 3.8) & (maxY() >= 2.2 & maxY() <= 3.0) & harmLvl() == "Yes") {
       return("ORANGE")
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & (maxY() >= 2.2 & maxY() <= 3.0) & sensitLvl() == "No") {
+    if ((maxX() >= 3.0 & maxX() <= 3.8) & (maxY() >= 2.2 & maxY() <= 3.0) & harmLvl() == "No") {
       return("YELLOW")
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() < 2.2 & sensitLvl() == "No") {
+    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() < 2.2 & harmLvl() == "No") {
       return("YELLOW")
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() < 2.2 & sensitLvl() == "Yes") {
+    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() < 2.2 & harmLvl() == "Yes") {
       return("ORANGE")
     }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() > 3.0 & sensitLvl() == "Yes") {
+    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() > 3.0 & harmLvl() == "Yes") {
       return("ORANGE")
     }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() > 3.0 & sensitLvl() == "No") {
+    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() > 3.0 & harmLvl() == "No") {
       return("YELLOW")
     }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() <= 3.0 & (sensitLvl() == "Yes"|sensitLvl() == "No")) {
+    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() <= 3.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
       return("YELLOW")
     }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() < 2.2 & (sensitLvl() == "Yes"|sensitLvl() == "No")) {
+    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() < 2.2 & (harmLvl() == "Yes"|harmLvl() == "No")) {
       return("GREEN")
     }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.2 & sensitLvl() == "Yes") {
+    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.2 & harmLvl() == "Yes") {
       return("YELLOW")
     }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.2 & sensitLvl() == "No") {
+    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.2 & harmLvl() == "No") {
       return("GREEN")
     }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() < 2.2 & (sensitLvl() == "Yes"|sensitLvl() == "No")) {
+    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() < 2.2 & (harmLvl() == "Yes"|harmLvl() == "No")) {
       return("BLUE")
     }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.2 & sensitLvl() == "Yes") {
+    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.2 & harmLvl() == "Yes") {
       return("GREEN")
     }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.2 & sensitLvl() == "No") {
+    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.2 & harmLvl() == "No") {
       return("BLUE")
     }
 
@@ -462,7 +459,7 @@ server <- function(input, output, session) {
   }
   )
   
-  # add validation for required fields (only required fields are dataType and particType; sensitLvl is always either yes or no)
+  # add validation for required fields (only required fields are dataType and particType; harmLvl is always either yes or no)
   
   iv <- InputValidator$new()
   iv$add_rule("dataType", sv_required())
@@ -500,7 +497,7 @@ server <- function(input, output, session) {
   )
   
   
-  # reset all values when actionButton reset is clicked; all inputs are cleared (except sensitLvl & datActiv which return to default) 
+  # reset all values when actionButton reset is clicked; all inputs are cleared (except harmLvl & datActiv which return to default) 
   # and reactive value reset$clear is
   # returned to NA
   
@@ -509,7 +506,7 @@ server <- function(input, output, session) {
     updateSelectInput(inputId = "dataType", selected=character(0))
     updateSelectInput(inputId = "adultChild", selected=character(0))
     updateSelectInput(inputId = "particType", selected=character(0))
-    updateSelectInput(inputId = "sensitLvl", selected="No")
+    updateSelectInput(inputId = "harmLvl", selected="No")
     updateSelectInput(inputId = "datActiv", selected=c("storage","transfer","students","archiving","reuse"))
     reset$clear <- NA
     
@@ -548,15 +545,20 @@ server <- function(input, output, session) {
  # render basic text explaining risk category assigned to user
   
   
-  output$text <- renderText({
+  output$textResults <- renderUI({
     # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
     # then no output will be returned. If anything else, the plot will be returned
     if (is.na(reset$clear)) return()
     
-    paste("Data risk level is", maxX(), 
-          "and participant vulnerability level is", maxY(), 
-          "Risk category is", rskCateg(),
-          "And presence of green data is", grnDatSum())
+    if (harmLvl() == "Yes") {
+      harmTxt <- "are"
+    } else {
+      harmTxt <- "are no"
+    }
+    
+    HTML(paste0("Your data risk classification is ", strong(rskCateg()), 
+          ". You have indicated that there ",  strong(harmTxt), " increased risks of
+          harm to your participants."))
   }
   
   )
@@ -566,85 +568,131 @@ server <- function(input, output, session) {
   
   # first create a reactive that identifies which data processing activities were chosen by user
   
-  datProc <- eventReactive(input$view, {
+  datProc <- reactive({
     req(input$datActiv)
     
     datProc <- input$datActiv
     
   })
   
-  # based on datProc as well as rskCateg calculations, concat recommendations text and render into UI
-
+  # set up action button shwYelReus that only appears if rskCateg is GREEN and datProc is "reuse"
   
-  output$recommendations <- renderUI({
-
-      combineMD <- c(readLines("mdFiles/introRec.Rmd"), readLines("mdFiles/genRec.Rmd")) #read in Rmd that provides the yaml and css at very top & Rmd that gives general guidance
+  # first create reactive value show$yellow that will always be NA except for the conditions when
+  # we want the action button shwYelReus to be shown
+  
+  show <- reactiveValues(yellow = NA)
+  
+  # allow shwYelReus action button to be seen
+  
+  observe({
+    if (rskCateg()=="GREEN" & "reuse" %in% datProc() & is.na(show$yellow)) {
+      shinyjs::show(id = "shwYelReus")
+    } 
+  }
+  )
+  
+  # on click of shwYelReus show$yellow reactive value becomes 1 which will impact the chosen markdown
+  # outputs in the following renderUI section
+  
+  observeEvent(input$shwYelReus, {
+    
+    show$yellow <- 1
+    shinyjs::hide(id = "shwYelReus")
+    
+  })
+  
+  # return show$yellow to NA and hide action button shwYelReus again if reuse is deselected or data is no longer GREEN
+  
+  observe({
+    if (rskCateg()!="GREEN" | !("reuse" %in% datProc())) {
+      show$yellow <- NA
+      shinyjs::hide(id = "shwYelReus")
+    } 
+  }
+  )
+  
+  # based on datProc as well as rskCateg calculations, concat recommendations text and render into UI
+  # if the action button shwYelReus has been clicked and the rskCateg is GREEN the first action will carry out
+  # and include the yellow reuse instructions. For all other cases, the recommendations will simply be
+  # combined based on rskCateg color and which datProc activities are currently selected by the user
+  
+  combineMD <- reactive({
+    if (!is.na(show$yellow)) {
+      combineMD <- c(readLines("mdFiles/genRec.Rmd")) #read in Rmd that provides the yaml and css at very top & Rmd that gives general guidance
       for(i in 1:length(datProc())) {
         mdFile <- paste0("mdFiles/",datProc()[i],rskCateg(), ".Rmd")
         combineMD <- c(combineMD, readLines(mdFile))
       }
-
+      combineMD <- c(combineMD, readLines("mdFiles/reuseYELLOW.Rmd"))
+      } else {
+      combineMD <- c(readLines("mdFiles/genRec.Rmd")) #read in Rmd that provides the yaml and css at very top & Rmd that gives general guidance
+      for(i in 1:length(datProc())) {
+        mdFile <- paste0("mdFiles/",datProc()[i],rskCateg(), ".Rmd")
+        combineMD <- c(combineMD, readLines(mdFile))
+      }
+    }
     
-    
-  
     writeLines(combineMD, "mdFiles/combinedRec.Rmd")
-    includeMarkdown(render("mdFiles/combinedRec.Rmd", 
-                           output_file = 'combinedRec', 
-                           output_dir ='mdFiles', 
-                           quiet = TRUE))
+    
+    # originally rendered Rmd to markdown but changed to rendering to html below
+    # just need to ensure that markdownToHTML command includes template = FALSE to not
+    # mess up formatting
+    
+    #includeMarkdown(render("mdFiles/combinedRec.Rmd", 
+     #                      output_file = 'combinedRec', 
+      #                     output_dir ='mdFiles', 
+       #                    quiet = TRUE))
+    
+    HTML(markdown::markdownToHTML(knit('mdFiles/combinedRec.Rmd', 
+                                       output ='mdFiles/combinedRec.html',
+                                       quiet = TRUE),
+                                      template = FALSE ))
+    
+  })
+  
+  output$recommendations <- renderUI({
+    # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
+    # then no output will be returned. If anything else, the plot will be returned
+    if (is.na(reset$clear)) return()
+    
+    combineMD()
   
     })
   
-  # allow to switch from green reuse advice to yellow
-  # show button to allow switch
-  
-  # not sure if I want to do the following
-  # added complexity, may add back later if desired
-  
-  #observe({
-  #  if (rskCateg() == "GREEN" & "reuse" %in% datProc()) {
-  #    shinyjs::show(id = "swtchReuseYel")
-  #  }
-  #}
- # )
-  
-  #observeEvent(input$swtchReuseYel, {
-   # output$recommendations <- renderUI({
-      
-   #   newLength <- length(datProc()) - 1
-    
-    #  combineMD <- c(readLines("mdFiles/introRec.Rmd"), readLines("mdFiles/genRec.Rmd")) #read in Rmd that provides the yaml and css at very top & Rmd that gives general guidance
-    #  for(i in 1:newLength) {
-     #  mdFile <- paste0("mdFiles/",datProc()[i],rskCateg(), ".Rmd")
-     #   combineMD <- c(combineMD, readLines(mdFile))
-    #  }
-    #  combineMD <- c(combineMD, readLines("mdFiles/reuseYELLOW.Rmd"))
-    
-    
-    
-    #  writeLines(combineMD, "mdFiles/combinedRec.Rmd")
-    #  includeMarkdown(render("mdFiles/combinedRec.Rmd", 
-    #                       output_file = 'combinedRec', 
-    #                       output_dir ='mdFiles', 
-     #                      quiet = TRUE))
-    
-    
-   # }
-    
-   # )
- # }
-  #)
 
   
   # render instructions.Rmd to md and convert to an output that can be presented in the "How to use this tool" tab of the UI
   
   output$instructions <- renderUI({
-    includeMarkdown(render("mdFiles/instructions.Rmd", 
-                           output_file = 'instructions', 
-                           output_dir ='mdFiles', 
-                           quiet = TRUE))
+    
+    # originally rendered Rmd to markdown but changed to rendering to html below
+    # just need to ensure that markdownToHTML command includes template = FALSE to not
+    # mess up formatting
+    
+    #includeMarkdown(render("mdFiles/instructions.Rmd", 
+    #           output_file = 'instructions', 
+    #         output_dir ='mdFiles', 
+    #         quiet = TRUE))
+    
+    HTML(markdown::markdownToHTML(knit('mdFiles/instructions.Rmd', 
+                                       output ='mdFiles/instructions.html',
+                                       quiet = TRUE),
+                                      template = FALSE ))
+    
   })
   
+  
+  # include additional guidance on the various data types and also further info on the privacy risk categorizations and examples
+  
+  output$datTypTab <- renderUI({
+      HTML(markdown::mark_html(knit('mdFiles/addGuidance.Rmd', 
+                                    output ='mdFiles/addGuidance.html',
+                                    quiet = TRUE), 
+                                    template = FALSE)) 
+    # note: template FALSE needs to be included in markdownToHTML to prevent
+    # the knitted html doc from altering the format and style of the shiny app when rendered
+    }
+  )
   
 }
 
