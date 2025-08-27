@@ -1,9 +1,12 @@
 .Rproj.user
 .Rhistory
 .Ruserdata
-.html
 
-.xlsx
+
+mdFiles/*.html
+mdFiles/combinedRec.Rmd
+
+data/*.xlsx
 
 .DS_Store
 
