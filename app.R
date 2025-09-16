@@ -17,7 +17,7 @@ pacman::p_load(
   "rmarkdown",
   "knitr",
   "kableExtra",
-  "ragg"
+  "ggplot2"
 )
 
 #---- 0.0: set and source parameters ----
