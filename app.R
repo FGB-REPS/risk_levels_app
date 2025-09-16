@@ -3,26 +3,50 @@
 # by common FGB data types and research populations
 #
 
-library(shiny)
-library(shinyvalidate)
-library(shinyjs)
-library(bslib)
-library(tidyverse)
-library(shinycssloaders)
-library(markdown)
-library(rmarkdown)
-library(knitr)
-library(kableExtra)
 
 
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  "shiny",
+  "shinyvalidate",
+  "shinyjs",
+  "bslib",
+  "tidyverse",
+  "shinycssloaders",
+  "markdown",
+  "rmarkdown",
+  "knitr",
+  "kableExtra"
+)
 
-#load data 
+#---- 0.0: set and source parameters ----
+## ---- 0.1: Set filepaths----
 
-load("data/rskData.RData")
-
-# source helper functions
-
-source("helper_fxs.R")
+# Running in container
+if(!grepl("Users", getwd())){
+  setwd("/home/shiny")
+  # Specify the application port
+  options(shiny.host = "127.0.0.1")
+  options(shiny.port = 7950)
+  
+  # source helper functions
+  
+  source("helper_fxs.R")
+  
+  #load data 
+  
+  load("data/rskData.RData")
+  
+  # Running locally
+} else {
+  #load data 
+  
+  load("data/rskData.RData")
+  
+  # source helper functions
+  
+  source("helper_fxs.R")
+}
 
 
 
@@ -49,6 +73,7 @@ source("helper_fxs.R")
 # - further additions to UI will come in future versions
 
 
+### MAY NEED TO USE includeCSS THE WAY SAM DID IF APP WON'T READ IN CSS FILES"
 
 # Define UI ----
 ui <- page_sidebar(
