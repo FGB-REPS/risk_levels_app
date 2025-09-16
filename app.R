@@ -24,7 +24,7 @@ pacman::p_load(
 
 # Running in container
 if(!grepl("Users", getwd())){
-  setwd("/home/shiny")
+  setwd("/home/shiny/app")
   # Specify the application port
   options(shiny.host = "127.0.0.1")
   options(shiny.port = 7950)
