@@ -16,7 +16,8 @@ pacman::p_load(
   "markdown",
   "rmarkdown",
   "knitr",
-  "kableExtra"
+  "kableExtra",
+  "ragg"
 )
 
 #---- 0.0: set and source parameters ----
