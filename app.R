@@ -11,13 +11,14 @@ pacman::p_load(
   "shinyvalidate",
   "shinyjs",
   "bslib",
-  "tidyverse",
+  "dplyr",
+  "stringr",
+  "ggplot2",
   "shinycssloaders",
   "markdown",
   "rmarkdown",
   "knitr",
-  "kableExtra",
-  "ggplot2"
+  "kableExtra"
 )
 
 #---- 0.0: set and source parameters ----

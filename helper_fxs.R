@@ -116,7 +116,7 @@ adjustINX <- function(df, typeINX, resultINX) {
 excepToIncrFx <- function(df) {
   df$resNoIncr <- 0 # create variable for identifying the need for adjustments
   if(sum(!is.na(df$ExcepToIncr)) > 0) {
-  excepToIncrVect <- str_remove(df$ExcepToIncr[!is.na(df$ExcepToIncr)], ";") # create vector of each 
+  excepToIncrVect <- stringr::str_remove(df$ExcepToIncr[!is.na(df$ExcepToIncr)], ";") # create vector of each 
   # VarName listed under ExcepToIncr, but remove all missings and remove the ; that is included in the raw data
   # note, this function only works if there is only one VarName listed in ExcepToIncr
   # if that changes in the future we will need a different function here
@@ -143,8 +143,8 @@ lvlCalcFx <- function(df) {
     # first occurence of the max Lvl 
     # arrange by occurences of NoINX so that first occurence of max(Lvl) should be one where 
     # NoINX == 0
-    arrange(NoINX) %>%
-    mutate(duplMax = case_when(Lvl %in% max(Lvl) & duplicated(Lvl) ~ 1,
+    dplyr::arrange(NoINX) %>%
+    dplyr::mutate(duplMax = case_when(Lvl %in% max(Lvl) & duplicated(Lvl) ~ 1,
                                TRUE ~ 0))
   
   newDF <- if ("resNoIncr" %in% names(newDF)) { # check if resNoIncr variable present (after excepToIncrFx has been run) 
@@ -153,7 +153,7 @@ lvlCalcFx <- function(df) {
       # calculate overall new Lvl value taking into consideration
       # the duplicated max values and the impact of different
       # identifier combo's
-      mutate(lvlCalc = case_when(Lvl == max(Lvl) & duplMax == 0 ~ Lvl,
+      dplyr::mutate(lvlCalc = dplyr::case_when(Lvl == max(Lvl) & duplMax == 0 ~ Lvl,
                                  resNoIncr == 1 ~ 0,
                                  NoINX == 1 ~ 0,
                                  DirectID == 1 ~ 0.3,
@@ -168,7 +168,7 @@ lvlCalcFx <- function(df) {
       # calculate overall new Lvl value taking into consideration
       # the duplicated max values and the impact of different
       # identifier combo's
-      mutate(lvlCalc = case_when(Lvl == max(Lvl) & duplMax == 0 ~ Lvl,
+      dplyr::mutate(lvlCalc = dplyr::case_when(Lvl == max(Lvl) & duplMax == 0 ~ Lvl,
                                  NoINX == 1 ~ 0,
                                  DirectID == 1 ~ 0.3,
                                  HRIndirID == 1 ~ 0.2,
@@ -180,7 +180,7 @@ lvlCalcFx <- function(df) {
   }
   
   newDF %>%
-    summarise(maxX = sum(lvlCalc)) %>%
+    dplyr::summarise(maxX = sum(lvlCalc)) %>%
     # if total maxLvl is greater than 5, recalculate it to a max of 5
-    mutate(maxX = ifelse(maxX > 5, 5, maxX))
+    dplyr::mutate(maxX = ifelse(maxX > 5, 5, maxX))
 }
