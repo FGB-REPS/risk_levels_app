@@ -1,0 +1,4 @@
+#R_LIBS_SITE=/usr/local/lib/R/site-library
+#R_LIBS_USER=/usr/local/lib/R/library
+#R_LIBS=${R_LIBS_SITE}:${R_LIBS_USER}
+#R_HOME=
