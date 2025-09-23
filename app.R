@@ -15,6 +15,7 @@ pacman::p_load(
   "stringr",
   "ggplot2",
   "shinycssloaders",
+  "htmltools",
   "markdown",
   "rmarkdown",
   "knitr",
@@ -75,7 +76,7 @@ if(!grepl("Users", getwd())){
 # - further additions to UI will come in future versions
 
 
-### MAY NEED TO USE includeCSS THE WAY SAM DID IF APP WON'T READ IN CSS FILES"
+
 
 # Define UI ----
 ui <- page_sidebar(
@@ -85,6 +86,7 @@ ui <- page_sidebar(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")  
   ),
+  includeCSS("www/styles.css"),
   title = "Data Risk Classification",
   sidebar = sidebar(
     accordion(
