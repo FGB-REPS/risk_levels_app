@@ -243,9 +243,24 @@ ui <- page_sidebar(
       uiOutput("datTypTab")  %>% withSpinner(type = getOption("spinner.type", default = 5),
                                                     color = getOption("spinner.color", default = "#2da4e7"))
       
+    ),
+    # panel for instructions on how to use the tool (if needed)
+    nav_panel(
+      "Feedback",
+      withTags({
+        div(h2("Do you have feedback on this app?"),
+            br(),
+            p("This app is currently in its first release and will undergo further refinement. Your feedback will help greatly in making this app function better for you and your colleagues!"),
+            br(),
+            a(href="https://vuamsterdam.eu.qualtrics.com/jfe/form/SV_6F3lfyQDtjLf2rs", target="_blank", id="feedbackBtn", class="btn btn-primary", "Give feedback!")
+        )
+      })
     )
   )
 )
+
+
+
 
 # Define server logic ----
 server <- function(input, output, session) {
