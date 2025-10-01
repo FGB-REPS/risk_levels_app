@@ -1,7 +1,9 @@
-#
-# This is a Shiny web application for estimating privacy risks posed 
+# ==============================================================================
+# Project: Risk Level Categorization App
+# Author(s): Jessica Hrudey (e.j.hrudey@vu.nl)
+# Description: This is a Shiny web application for estimating privacy risks posed 
 # by common FGB data types and research populations
-#
+# ==============================================================================
 
 
 

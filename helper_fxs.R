@@ -1,6 +1,12 @@
-# helper functions for support app.R to operate properly
+# ==============================================================================
+# Project: Risk Level Categorization App
+# Author(s): Jessica Hrudey (e.j.hrudey@vu.nl)
+# Description: helper functions for app.R to operate properly
+# ==============================================================================
 
-# typeINXfx - creates a subset of the selected dataframe (determined by the user) that only includes the variables
+# ==============================================================================
+# Function: typeINXfx
+# Description: creates a subset of the selected dataframe (determined by the user) that only includes the variables
 #  ExcepToNoINX, INXincrDir, INXincrHRindir, INXincrLRindir and INXdecrLRindir
 # this step is necessary to carry out adjustINX (the following function) because adjustINX will iterate through
 # the same steps for each of the INX variables
@@ -9,7 +15,11 @@ typeINXfx <- function(df) {
   typeINXdf <- df[stringr::str_detect(names(df), "INX")][-stringr::str_detect(names(df), "NoINX")]
 }
 
-# adjustINX - function to identify if there is a combination of risk variables that alter the normal risk level calculation
+
+# ==============================================================================
+
+# Function: adjustINX
+# Description: function to identify if there is a combination of risk variables that alter the normal risk level calculation
 # e.g. if a VarName has other VarNames listed under ExcepToNoINX, INXincrDir, INXincrHRindir, INXincrLRindir or INXdecrLRindir
 # *and* one of those VarNames listed is also in the included subset, then the combination between the two VarNames will be different
 # depending the type of interaction. Basically need to identify if a modifying interaction between VarNames is
@@ -109,7 +119,10 @@ adjustINX <- function(df, typeINX, resultINX) {
   return(df)
 }
 
-# function for checking and making note of combinations of VarNames where ExcepToIncr applies
+
+# ==============================================================================
+# Function: excepToIncrFx
+# Description: function for checking and making note of combinations of VarNames where ExcepToIncr applies
 # in this situation the adjustINX function can't be applied because we need to identify the VarNames
 # that the adjustments apply to differently
 
@@ -132,8 +145,9 @@ excepToIncrFx <- function(df) {
   return(df)
 }
 
-
-# function for calculating over all data reidentification risk level
+# ==============================================================================
+# Function: lvlCalcFx
+# Description: function for calculating over all data reidentification risk level
 
 
 lvlCalcFx <- function(df) {
