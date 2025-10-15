@@ -115,16 +115,23 @@ ui <- page_sidebar(
         # create button to deselect all data processing activities
         shinyjs::hidden(actionButton("deselAllGenDat", "Deselect all", class="btn-outline-primary")),
         # select inputs for specific data types to go on x-axis
-        selectInput("dataType", 
+        selectizeInput("dataType", 
                     label = span("Select specific type(s) of data",
                                  span(
                                    tooltip(
                                      bsicons::bs_icon("info-circle"),
-                                     "Select all of the types of data you wish to assess in the current risk analysis"
+                                     "You can type in the field below to search for a data type. See the 'How to use this tool' tab for more information on choosing which data types to include and the 'Additional Guidance' tab for more information on the types of data"
                                     )
                                   )
                                  ),
-                    choices = sort(rskDatTyp$ShortDescription), multiple = TRUE, selectize = TRUE),
+                    choices = sort(rskDatTyp$ShortDescription), 
+                    multiple = TRUE, 
+                    #selectize = TRUE,
+                    options = list(
+                      plugins = list("remove_button"),
+                      create = FALSE, # don't allow creation of new data type entries by user
+                      persist = FALSE # don't allow creation of new data type entries by user
+                    )),
         #create button to clear data type inputs
         actionButton("dataClear", "Clear inputs", class="btn btn-outline-primary")
         
@@ -133,26 +140,33 @@ ui <- page_sidebar(
         "Participant types",
         # select inputs for whether participants are adults or children
         checkboxGroupInput("adultChild", 
-                         label = span("Select participant age group (optional)",
+                         label = span("Select participant/research subject age group (optional)",
                                       span(
                                         tooltip(
                                           bsicons::bs_icon("info-circle"),
-                                          "You may select the age grouping of the participants in order to 
-                                          filter the choices shown when selecting the specific participant type(s)"
+                                          "You may select the age grouping of the participants/research subjects in order to 
+                                          filter the choices shown when selecting the specific type(s)"
                                         )
                                       )),
                          choices = c("Adult participants", "Children participants"),
                          inline = TRUE),
         # select inputs for vulnerability of participants on y-axis
-        selectInput("particType", 
+        selectizeInput("particType", 
                   label = span("Select type(s) of research participants",
                                span(
                                  tooltip(
                                    bsicons::bs_icon("info-circle"),
-                                   "Select all of the participant types you wish to assess in the current risk analysis"
+                                   "You can type in the field below to search for a participant/research subject type. See the 'How to use this tool' tab for more information on choosing which participant/research subject types to include."
                                  )
                                )),
-                  choices = sort(rskResPart$ShortDescription), multiple = TRUE, selectize = TRUE),
+                  choices = sort(rskResPart$ShortDescription), 
+                  multiple = TRUE, 
+                  #selectize = TRUE,
+                  options = list(
+                    plugins = list("remove_button"),
+                    create = FALSE, # don't allow creation of new data type entries by user
+                    persist = FALSE # don't allow creation of new data type entries by user
+                  )),
         #create button to clear participant type inputs
         actionButton("particClear", "Clear inputs", class="btn btn-outline-primary")
         ),
