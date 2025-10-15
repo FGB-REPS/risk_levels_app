@@ -15,7 +15,7 @@ Once users have completed the necessary response fields, they will receive a pri
 
 ## How to use
 
-The primary end user should review the "How to use this tool" tab on the [application](https://risk_levels_app.rshiny.labs.vu.nl/){:target="_blank"}.
+The primary end user should review the "How to use this tool" tab on the [application](https://risk_levels_app.rshiny.labs.vu.nl/).
 
 Users wishing to modify and implement this app for their own purposes can fork this repository and adjust the contents as needed. To modify the app for another discipline the user should begin with the contents of:
 
@@ -69,9 +69,9 @@ The risk categorizations are ultimately defined in the server section of app.R. 
 
 Creator:
 
-* [Jessica Hrudey](https://github.com/jhrudey){:target="_blank"}
+* [Jessica Hrudey](https://github.com/jhrudey)
 
 Maintainer(s):
 
-* [Jessica Hrudey](https://github.com/jhrudey){:target="_blank"}
+* [Jessica Hrudey](https://github.com/jhrudey)
   
