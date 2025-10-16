@@ -12,6 +12,7 @@ pacman::p_load(
   "shiny",
   "shinyvalidate",
   "shinyjs",
+  "shinyStorePlus",
   "bslib",
   "dplyr",
   "stringr",
@@ -83,6 +84,8 @@ if(!grepl("Users", getwd())){
 # Define UI ----
 ui <- page_sidebar(
   useShinyjs(),
+  # Initialize shinyStorePlus
+  initStore(),
   theme = bs_theme(bootswatch = "cerulean"),
   #  custom CSS
   tags$head(
@@ -753,6 +756,10 @@ server <- function(input, output, session) {
     # the knitted html doc from altering the format and style of the shiny app when rendered
     }
   )
+  
+  # SAVE USER INPUT
+  appid <- "app666" # id doesn't matter too much AFAIK
+  setupStorage(appId = appid, inputs = TRUE)
   
 }
 
