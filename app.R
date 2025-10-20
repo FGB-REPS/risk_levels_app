@@ -296,15 +296,22 @@ server <- function(input, output, session) {
   
 
   # use reactive to update choices available in dataType
+  # make sure that selecting generic data types after entering some specific types doesn't clear the already entered specific types
   
   observe({
       inptGenDat <- input$genDataType
-      if (!is.null(inptGenDat)) {
+      inptSelDat <- input$dataType
+      if (!is.null(inptGenDat) & is.null(inptSelDat)) {
         updateSelectInput(inputId = "dataType", choices = sort(choicesDat()), selected = input$dataType)
-      } else {
+      } else if (!is.null(inptGenDat) & !is.null(inptSelDat)) { # makes sure entered specific types aren't cleared if general types selected after specific entered
+        updateSelectInput(inputId = "dataType", choices = sort(c(choicesDat(), input$dataType)), selected = input$dataType)
+      }
+      else {
         updateSelectInput(inputId = "dataType", choices = sort(rskDatTyp$ShortDescription), selected = input$dataType)
       }
   })
+  
+  
   
   # calculate the maximum value for the x-axis (re-identification risk)
   # create reactive maxX to represent this max value
@@ -321,7 +328,9 @@ server <- function(input, output, session) {
     
   })
   
-  # create reactive from adultChile that alters which choices are shown in particType input section
+  
+  
+  # create reactive from adultChild that alters which choices are shown in particType input section
   
   choicesPart <- reactive({
     req(input$adultChild)
@@ -332,13 +341,18 @@ server <- function(input, output, session) {
   })
   
   # use reactive to update choices available in particType
+  # make sure that selecting age group after entering some participant types doesn't clear the already entered participant types
   
   observe({
-    inptPartTyp <- input$adultChild
+    inptAgeTyp <- input$adultChild
+    inptPartType <- input$particType
     
-    if(!is.null(inptPartTyp)) {
+    if(!is.null(inptAgeTyp) & is.null(inptPartType)) {
       updateSelectInput(session, inputId = "particType", choices = sort(choicesPart()), selected = input$particType)
-    } else {
+    } else if (!is.null(inptAgeTyp) & !is.null(inptPartType)) { # makes sure entered partic types aren't cleared if age group selected after participant type entered
+      updateSelectInput(session, inputId = "particType", choices = sort(c(choicesPart(), input$particType)), selected = input$particType)
+    }
+      else {
       updateSelectInput(session, inputId = "particType", choices = sort(rskResPart$ShortDescription), selected = input$particType)
     }
   })
