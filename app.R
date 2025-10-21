@@ -143,11 +143,11 @@ ui <- page_sidebar(
         "Participant types",
         # select inputs for whether participants are adults or children
         checkboxGroupInput("adultChild", 
-                         label = span("Select participant/research subject age group (optional)",
+                         label = span("Select research subject age group (optional)",
                                       span(
                                         tooltip(
                                           bsicons::bs_icon("info-circle"),
-                                          "You may select the age grouping of the participants/research subjects in order to 
+                                          "You may select the age grouping of the research subjects in order to 
                                           filter the choices shown when selecting the specific type(s)"
                                         )
                                       )),
@@ -155,11 +155,12 @@ ui <- page_sidebar(
                          inline = TRUE),
         # select inputs for vulnerability of participants on y-axis
         selectizeInput("particType", 
-                  label = span("Select type(s) of research participants",
+                  label = span("Select type(s) of research subjects",
                                span(
                                  tooltip(
                                    bsicons::bs_icon("info-circle"),
-                                   "You can type in the field below to search for a participant/research subject type. See the 'How to use this tool' tab for more information on choosing which participant/research subject types to include."
+                                   "You can type in the field below to search for a specific research subject type. 
+                                   See the 'How to use this tool' tab for more information on research subject types."
                                  )
                                )),
                   choices = sort(rskResPart$ShortDescription), 
@@ -176,7 +177,7 @@ ui <- page_sidebar(
         accordion_panel(
           "Risk of harm",
           radioButtons("harmLvl",
-                   label = span("Does the information contained in the data pose additional risks of harm to the participants?",
+                   label = span("Does the information contained in the data pose additional risks of harm to the research subjects?",
                                 span(
                                   tooltip(
                                     bsicons::bs_icon("info-circle"),
