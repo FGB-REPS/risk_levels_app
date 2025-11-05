@@ -3,7 +3,6 @@
 # Author(s): Jessica Hrudey (e.j.hrudey@vu.nl)
 # Description: helper functions for app.R to operate properly
 # ==============================================================================
-
 # ==============================================================================
 # Function: typeINXfx
 # Description: creates a subset of the selected dataframe (determined by the user) that only includes the variables
@@ -129,18 +128,23 @@ adjustINX <- function(df, typeINX, resultINX) {
 excepToIncrFx <- function(df) {
   df$resNoIncr <- 0 # create variable for identifying the need for adjustments
   if(sum(!is.na(df$ExcepToIncr)) > 0) {
-  excepToIncrVect <- stringr::str_remove(df$ExcepToIncr[!is.na(df$ExcepToIncr)], ";") # create vector of each 
-  # VarName listed under ExcepToIncr, but remove all missings and remove the ; that is included in the raw data
-  # note, this function only works if there is only one VarName listed in ExcepToIncr
-  # if that changes in the future we will need a different function here
-  for (i in 1:nrow(df)) { #iterate through row of df
-    for (j in 1:length(excepToIncrVect)) { #iterate through each value of the VarNames included in the vector
-      if (df$VarName[i] == excepToIncrVect[j]) { # if a VarName written in ExcepToIncr is present in the dataset
-        # that VarName gets highlighted with resNoIncr so that that VarName does not add to the overall calculations
-        df$resNoIncr[i] <- 1
+    # create vector of each 
+    # VarName listed under ExcepToIncr, but remove all missings and remove the ; that is included in the raw data
+    # plus extra steps to also split up the variable names if more than one is included for a given record
+    # and then include each of these separately to the vector so that the vector has each VarName per index
+    excepToIncrVect <-   stringr::str_trim(
+      unlist(
+        stringr::str_split(df$ExcepToIncr[!is.na(df$ExcepToIncr)], ";")))
+    excepToIncrVect <- excepToIncrVect[!excepToIncrVect == ""]
+    
+    for (i in 1:nrow(df)) { #iterate through row of df
+      for (j in 1:length(excepToIncrVect)) { #iterate through each value of the VarNames included in the vector
+        if (df$VarName[i] == excepToIncrVect[j]) { # if a VarName written in ExcepToIncr is present in the dataset
+          # that VarName gets highlighted with resNoIncr so that that VarName does not add to the overall calculations
+          df$resNoIncr[i] <- 1
+        }
       }
     }
-  }
   }
   return(df)
 }

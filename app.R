@@ -372,7 +372,7 @@ server <- function(input, output, session) {
   # user can still reset back to "No" if desired
   
   observeEvent(input$particType, {
-    if (maxY() > 3.0) {
+    if (maxY() >= 3.0) {
     updateSelectInput(inputId = "harmLvl", selected = "Yes")
     } else {
     updateSelectInput(inputId = "harmLvl", selected = "No")
@@ -408,62 +408,86 @@ server <- function(input, output, session) {
   })
   
   # determine color of risk category as reactive rskCateg()
+  # see inline comments for reasoning for cutoffs
+  # general reasoning: 
+  # -maxX >= 4.0 is directly identifiable
+  # -maxY >= 2.0 is increased, mid-range vulnerability 
+  # -maxY >=3.0 is extrame vulnerability due to additional stigma 
+  #   -maxY >=3.0 is where harmLvl auto changes to Yes and requires manual change to No by user
   
   rskCateg <- reactive({
     
-    if (maxX() >= 3.9 & maxY() >= 2.2 & harmLvl() == "Yes") {
-      return("RED")
+    if (maxX() >= 4.0 & maxY() >= 2.0 & harmLvl() == "Yes") {
+      return("RED") # fully identifiable, increased vulnerability and increased risk of harm
     } 
-    if (maxX() >= 3.9 & maxY() >= 2.2 & harmLvl() == "No") {
-      return("ORANGE")
+    if (maxX() >= 4.0 & maxY() >= 3.0 & harmLvl() == "No") {
+      return("RED") # fully identifiable, extreme vulnerability but no increased risk of harm 
+      #-> made still RED because of extreme vulnerability characteristics; subject to debate and discusion
     }
-    if (maxX() >= 3.9 & maxY() < 2.2 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("ORANGE")
+    if (maxX() >= 4.0 & (maxY() >= 2.0 & maxY() < 3.0) & harmLvl() == "No") {
+      return("ORANGE") # fully identifiable, increased but not extreme vulnerability and no increased risk of harm 
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() > 3.0 & harmLvl() == "Yes") {
-      return("RED")
+    if (maxX() >= 4.0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      return("ORANGE") # fully identifiable and low vulnerability, risk of harm is irrelevant
+      #-> potentially consider red for elevated risk of harm; subject to debate and discussion
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() > 3.0 & harmLvl() == "No") {
-      return("ORANGE")
+    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() >= 3.0 & harmLvl() == "Yes") {
+      return("RED") # high risk indirectly identifiable (easy to reidentify), extreme vulnerability and increased risk of harm
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & (maxY() >= 2.2 & maxY() <= 3.0) & harmLvl() == "Yes") {
-      return("ORANGE")
+    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() >= 3.0 & harmLvl() == "No") {
+      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), extreme vulnerability but no increased risk of harm
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & (maxY() >= 2.2 & maxY() <= 3.0) & harmLvl() == "No") {
-      return("YELLOW")
+    if ((maxX() >= 3.0 & maxX() < 4.0) & (maxY() >= 2.0 & maxY() < 3.0) & harmLvl() == "Yes") {
+      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), increased but not extreme vulnerability and increased risk of harm
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() < 2.2 & harmLvl() == "No") {
-      return("YELLOW")
+    if ((maxX() >= 3.0 & maxX() < 4.0) & (maxY() >= 2.4 & maxY() < 3.0) & harmLvl() == "No") {
+      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), higher level of increased but not extreme vulnerability and no increased risk of harm
     }
-    if ((maxX() >= 3.0 & maxX() <= 3.8) & maxY() < 2.2 & harmLvl() == "Yes") {
-      return("ORANGE")
+    if ((maxX() >= 3.5 & maxX() < 4.0) & (maxY() >= 2.0 & maxY() < 2.4) & harmLvl() == "No") {
+      return("ORANGE") # higher end of high risk indirectly identifiable (easier to reidentify), lower level of increased vulnerability 
+      #and no increased risk of harm
     }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() > 3.0 & harmLvl() == "Yes") {
-      return("ORANGE")
+    if ((maxX() >= 3.0 & maxX() < 3.5) & (maxY() >= 2.0 & maxY() < 2.4) & harmLvl() == "No") {
+      return("YELLOW") # lower end of high risk indirectly identifiable (easier to reidentify), lower level of increased vulnerability 
+      #and no increased risk of harm
     }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() > 3.0 & harmLvl() == "No") {
-      return("YELLOW")
+    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() < 2.0 & harmLvl() == "No") {
+      return("YELLOW") # high risk indirectly identifiable (easy to reidentify), low vulnerability and no increased risk of harm
     }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() <= 3.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("YELLOW")
+    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() < 2.0 & harmLvl() == "Yes") {
+      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), low vulnerability and increased risk of harm
     }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() < 2.2 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("GREEN")
+    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() >= 3.0 & harmLvl() == "Yes") {
+      return("ORANGE") # low risk indirectly identifiable (harder to reidentify), extreme vulnerability and increased risk of harm
     }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.2 & harmLvl() == "Yes") {
-      return("YELLOW")
+    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() >= 3.0 & harmLvl() == "No") {
+      return("YELLOW") # low risk indirectly identifiable (harder to reidentify), extreme vulnerability and NO increased risk of harm
+      #-> could argue making ORANGE because of extreme vulnerability characteristics; subject to debate and discusion
     }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.2 & harmLvl() == "No") {
-      return("GREEN")
+    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() < 3.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      return("YELLOW") # low risk indirectly identifiable (harder to reidentify), vulnerability anything other than extreme (i.e. either low or increased, but not extreme), risk of harm is irrelevant
     }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() < 2.2 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      return("GREEN") # technically personal data, low vulnerability, risk of harm is irrelevant
+    }
+    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.0 & harmLvl() == "Yes") {
+      return("YELLOW") # technically personal data, increased and extreme vulnerability and increased risk of harm
+    }
+    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.0 & harmLvl() == "No") {
+      return("GREEN") # technically personal data, increased and extreme vulnerability and no increased risk of harm
+      #-> potentially handle extreme vulernability separately here and consider as yellow even with no increased risk of harm; subject to debate and discussion
+    }
+    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      return("BLUE") # not personal data, low vulernability, risk of harm is irrelevant
+    }
+    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.0 & harmLvl() == "Yes") {
+      return("GREEN") # not personal data, increased and extreme vulnerability and increased risk of harm
+      #-> could argue if not personal data, should not elevate, but risks of harm suggest need to be careful. May also want to consider handling extreme vulnerability PLUS increased risk of harm as YELLOW; subject to debate and discussion
+    }
+    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.0 & harmLvl() == "No") {
       return("BLUE")
-    }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.2 & harmLvl() == "Yes") {
-      return("GREEN")
-    }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.2 & harmLvl() == "No") {
-      return("BLUE")
+      # not personal data, increased and extreme vulnerability and NO increased risk of harm
+      #-> could argue at least for extreme vulnerability to consider as GREEN; subject to debate and discussion
     }
 
   } 
@@ -636,7 +660,14 @@ server <- function(input, output, session) {
     
     HTML(paste0("Your data risk classification is ", strong(rskCateg()), 
           ". You have indicated that there ",  strong(harmTxt), " increased risks of
-          harm to your participants."))
+          harm to your participants."),
+
+         # for app testing it is also helpful to be able to temporarily view the maxX and maxY
+         # below can be commented in or out depending on need for testing
+         #paste(strong("Re-identification risk is", maxX(), "and vulnerability risk is",  maxY()))
+         )
+
+    
   }
   
   )
