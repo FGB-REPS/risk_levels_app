@@ -12,6 +12,7 @@ data/*.xlsx
 .DS_Store
 
 /xtraScripts
+/xtraDocs
 
 
 .Rproj.user
