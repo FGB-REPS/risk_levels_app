@@ -95,7 +95,7 @@ ui <- page_sidebar(
   title = "Data Risk Classification",
   sidebar = sidebar(
     accordion(
-      open = c("Data types", "Participant types", "Risk of harm"), # set first panel to open upon load
+      open = c("Data types", "Participant types", "Risk of harm", "Additional confidentiality concerns"), # set which panels are open upon load
       accordion_panel(
         "Data types",
         # select inputs for general data types to narrow down options of specific data types
@@ -188,8 +188,87 @@ ui <- page_sidebar(
                                 )),
                    choices= c("No", "Yes"),
                    selected = "No"
-          )
+                  )
       
+        ),
+        accordion_panel(
+          "Additional confidentiality concerns",
+          radioButtons("confidCommVal",
+                     label = span("Is the data commercially valuable?",
+                                  span(
+                                    tooltip(
+                                      bsicons::bs_icon("info-circle"),
+                                      "Select 'yes' if the data has a clear potential for commercial purposes in the future
+                                      or if the data is sourced from an organization that is using the data for commercial purposes"
+                                    )
+                                  )
+                                  ),
+                     choices= c("No", "Yes"),
+                     selected = "No"
+          ),
+          radioButtons("confidOblig",
+                       label = span("Is the data subject to confidentiality obligations set forth in any collaboration or data transfer agreements?",
+                                    span(
+                                      tooltip(
+                                        bsicons::bs_icon("info-circle"),
+                                        "Select 'yes' if there are contracts or agreements between yourself and other parties 
+                                        that require that the data be kept confidential"
+                                      )
+                                    )
+                                    ),
+                       choices= c("No", "Yes"),
+                       selected = "No"
+          ),
+          radioButtons("confidKnowlSec",
+                       label = span("Does the data contain unique knowledge, methods or algorithms?",
+                                    span(
+                                      tooltip(
+                                        bsicons::bs_icon("info-circle"),
+                                        "Select 'yes' if this unique information is proprietary, patented or subject to
+                                        any other intellectual property rules"
+                                      )
+                                    )
+                                    ),
+                       choices= c("No", "Yes"),
+                       selected = "No"
+          ),
+          radioButtons("confidIP",
+                       label = span("Is the data or information therein patentable or related to an unpublished innovation?",
+                                    span(
+                                      tooltip(
+                                        bsicons::bs_icon("info-circle"),
+                                        "Select 'yes' if the data/information have a clear potential to be patented or to be
+                                        developed further into a unique innovation"
+                                      )
+                                    )
+                                    ),
+                       choices= c("No", "Yes"),
+                       selected = "No"
+          ),
+          radioButtons("confidCommContr",
+                       label = span("Are there commercial contracts tied to this data?",
+                                    span(
+                                      tooltip(
+                                        bsicons::bs_icon("info-circle"),
+                                        "Select 'yes' if the data are subject to agreements such as licensing agreements, non-disclosure,
+                                        agreements or any other agreements with a commercial partner"
+                                      )
+                                    )),
+                       choices= c("No", "Yes"),
+                       selected = "No"
+          ),
+          radioButtons("confidSecret",
+                       label = span("If the data is leaked or shared inappropriately, could that pose a risk to national security?",
+                                    span(
+                                      tooltip(
+                                        bsicons::bs_icon("info-circle"),
+                                        "Select 'yes' if the data contain state secrets or other information that could be used to 
+                                        disrupt critical national infrastructure, defense or economic stability"
+                                      )
+                                    )),
+                       choices= c("No", "Yes"),
+                       selected = "No"
+          )
         ),
         accordion_panel(
           "OPTIONAL: Data processing activities",
@@ -230,7 +309,20 @@ ui <- page_sidebar(
     # create button for viewing results once specific data types and participants are selected
     actionButton("view", "View results", class="btn btn-primary"),
     #create button to clear everything and start over
-    actionButton("reset", "Reset", class="btn btn-outline-primary")
+    actionButton("reset", "Reset", class="btn btn-outline-primary"),
+    # create download button to download BIV
+    # first create action button that user clicks so that a modal can pop up
+    # make this button disabled until the user puts in the necessary fields for the export
+    actionButton("downloadTrigger", "Download classification", class="btn btn-primary", icon = icon("download")
+                 , disabled = TRUE,
+                 ),
+    # then make a hidden download button the server clicks for us
+    # needs to be down this way because if we want a modal to pop up the button the user clicks
+    # on must be an actionButton, but if we want to carry out the downloadHandler function in the server
+    # to generate the data classification, we need a downloadButton to be "clicked". In this case
+    # it's clicked in secret!
+    downloadButton("downloadHidden", class="invisibleBtn")
+    
     
   ),
   # create panel of output information as well as supplementary instructions
@@ -407,91 +499,156 @@ server <- function(input, output, session) {
     
   })
   
+  # account for extra confidentiality questions and results to incorporate into rskCateg
+  
+  confidSecret <- reactive({
+    req(input$confidSecret)
+    confidSecret <- input$confidSecret
+  })
+  
+  confidOblig <- reactive({
+    req(input$confidOblig)
+    confidOblig <- input$confidOblig
+  })
+  
+  confidKnowlSec <- reactive({
+    req(input$confidKnowlSec)
+    confidKnowlSec <- input$confidKnowlSec
+  })
+  
+  confidIP <- reactive({
+    req(input$confidIP)
+    confidIP <- input$confidIP
+  })
+  
+  confidCommContr <- reactive({
+    req(input$confidCommContr)
+    confidCommContr <- input$confidCommContr
+  })
+  
+  confidCommVal <- reactive({
+    req(input$confidCommVal)
+    confidCommVal <- input$confidCommVal
+  })
+  
+  confidRes <- reactive({
+    
+    if (confidSecret() == "Yes") {
+      return("secret")
+    } else if (sum(confidOblig() == "Yes",
+                   confidKnowlSec() == "Yes",
+                   confidIP() == "Yes",
+                   confidCommContr() == "Yes",
+                   confidCommVal() == "Yes") >= 2) {
+      return("at least 2")
+    } else if (sum(confidOblig() == "Yes",
+                   confidKnowlSec() == "Yes",
+                   confidIP() == "Yes",
+                   confidCommContr() == "Yes",
+                   confidCommVal() == "Yes") >= 1) {
+      return("at least 1")
+    } else {
+      return("none")
+    }
+    
+  })
+  
+  
   # determine color of risk category as reactive rskCateg()
   # see inline comments for reasoning for cutoffs
   # general reasoning: 
   # -maxX >= 4.0 is directly identifiable
   # -maxY >= 2.0 is increased, mid-range vulnerability 
-  # -maxY >=3.0 is extrame vulnerability due to additional stigma 
-  #   -maxY >=3.0 is where harmLvl auto changes to Yes and requires manual change to No by user
+  # -maxY >=3.0 is extreme vulnerability due to additional stigma 
+  # -maxY >=3.0 is where harmLvl auto changes to Yes and requires manual change to No by user
   
   rskCateg <- reactive({
     
-    if (maxX() >= 4.0 & maxY() >= 2.0 & harmLvl() == "Yes") {
-      return("RED") # fully identifiable, increased vulnerability and increased risk of harm
-    } 
-    if (maxX() >= 4.0 & maxY() >= 3.0 & harmLvl() == "No") {
-      return("RED") # fully identifiable, extreme vulnerability but no increased risk of harm 
+    # first define all results based on maxX maxY and harmLvl as base_colour
+    
+    base_colour <- 
+      if (maxX() >= 4.0 & maxY() >= 2.0 & harmLvl() == "Yes") {
+      "RED" # fully identifiable, increased vulnerability and increased risk of harm
+    } else if (maxX() >= 4.0 & maxY() >= 3.0 & harmLvl() == "No") {
+      "RED" # fully identifiable, extreme vulnerability but no increased risk of harm 
       #-> made still RED because of extreme vulnerability characteristics; subject to debate and discusion
-    }
-    if (maxX() >= 4.0 & (maxY() >= 2.0 & maxY() < 3.0) & harmLvl() == "No") {
-      return("ORANGE") # fully identifiable, increased but not extreme vulnerability and no increased risk of harm 
-    }
-    if (maxX() >= 4.0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("ORANGE") # fully identifiable and low vulnerability, risk of harm is irrelevant
+    } else if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() >= 3.0 & harmLvl() == "Yes") {
+      "RED" # high risk indirectly identifiable (easy to reidentify), extreme vulnerability and increased risk of harm
+    } else if (maxX() >= 4.0 & (maxY() >= 2.0 & maxY() < 3.0) & harmLvl() == "No") {
+      "ORANGE" # fully identifiable, increased but not extreme vulnerability and no increased risk of harm 
+    } else if (maxX() >= 4.0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      "ORANGE" # fully identifiable and low vulnerability, risk of harm is irrelevant
       #-> potentially consider red for elevated risk of harm; subject to debate and discussion
-    }
-    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() >= 3.0 & harmLvl() == "Yes") {
-      return("RED") # high risk indirectly identifiable (easy to reidentify), extreme vulnerability and increased risk of harm
-    }
-    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() >= 3.0 & harmLvl() == "No") {
-      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), extreme vulnerability but no increased risk of harm
-    }
-    if ((maxX() >= 3.0 & maxX() < 4.0) & (maxY() >= 2.0 & maxY() < 3.0) & harmLvl() == "Yes") {
-      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), increased but not extreme vulnerability and increased risk of harm
-    }
-    if ((maxX() >= 3.0 & maxX() < 4.0) & (maxY() >= 2.4 & maxY() < 3.0) & harmLvl() == "No") {
-      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), higher level of increased but not extreme vulnerability and no increased risk of harm
-    }
-    if ((maxX() >= 3.5 & maxX() < 4.0) & (maxY() >= 2.0 & maxY() < 2.4) & harmLvl() == "No") {
-      return("ORANGE") # higher end of high risk indirectly identifiable (easier to reidentify), lower level of increased vulnerability 
+    } else if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() >= 3.0 & harmLvl() == "No") {
+      "ORANGE" # high risk indirectly identifiable (easy to reidentify), extreme vulnerability but no increased risk of harm
+    } else if ((maxX() >= 3.0 & maxX() < 4.0) & (maxY() >= 2.0 & maxY() < 3.0) & harmLvl() == "Yes") {
+      "ORANGE" # high risk indirectly identifiable (easy to reidentify), increased but not extreme vulnerability and increased risk of harm
+    } else if ((maxX() >= 3.0 & maxX() < 4.0) & (maxY() >= 2.4 & maxY() < 3.0) & harmLvl() == "No") {
+      "ORANGE" # high risk indirectly identifiable (easy to reidentify), higher level of increased but not extreme vulnerability and no increased risk of harm
+    } else if ((maxX() >= 3.5 & maxX() < 4.0) & (maxY() >= 2.0 & maxY() < 2.4) & harmLvl() == "No") {
+      "ORANGE" # higher end of high risk indirectly identifiable (easier to reidentify), lower level of increased vulnerability 
       #and no increased risk of harm
-    }
-    if ((maxX() >= 3.0 & maxX() < 3.5) & (maxY() >= 2.0 & maxY() < 2.4) & harmLvl() == "No") {
-      return("YELLOW") # lower end of high risk indirectly identifiable (easier to reidentify), lower level of increased vulnerability 
+    } else if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() < 2.0 & harmLvl() == "Yes") {
+      "ORANGE" # high risk indirectly identifiable (easy to reidentify), low vulnerability and increased risk of harm
+    } else if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() >= 3.0 & harmLvl() == "Yes") {
+      "ORANGE" # low risk indirectly identifiable (harder to reidentify), extreme vulnerability and increased risk of harm
+    } else if ((maxX() >= 3.0 & maxX() < 3.5) & (maxY() >= 2.0 & maxY() < 2.4) & harmLvl() == "No") {
+      "YELLOW" # lower end of high risk indirectly identifiable (easier to reidentify), lower level of increased vulnerability 
       #and no increased risk of harm
-    }
-    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() < 2.0 & harmLvl() == "No") {
-      return("YELLOW") # high risk indirectly identifiable (easy to reidentify), low vulnerability and no increased risk of harm
-    }
-    if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() < 2.0 & harmLvl() == "Yes") {
-      return("ORANGE") # high risk indirectly identifiable (easy to reidentify), low vulnerability and increased risk of harm
-    }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() >= 3.0 & harmLvl() == "Yes") {
-      return("ORANGE") # low risk indirectly identifiable (harder to reidentify), extreme vulnerability and increased risk of harm
-    }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() >= 3.0 & harmLvl() == "No") {
-      return("YELLOW") # low risk indirectly identifiable (harder to reidentify), extreme vulnerability and NO increased risk of harm
+    } else if ((maxX() >= 3.0 & maxX() < 4.0) & maxY() < 2.0 & harmLvl() == "No") {
+      "YELLOW" # high risk indirectly identifiable (easy to reidentify), low vulnerability and no increased risk of harm
+    } else if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() >= 3.0 & harmLvl() == "No") {
+      "YELLOW" # low risk indirectly identifiable (harder to reidentify), extreme vulnerability and NO increased risk of harm
       #-> could argue making ORANGE because of extreme vulnerability characteristics; subject to debate and discusion
-    }
-    if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() < 3.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("YELLOW") # low risk indirectly identifiable (harder to reidentify), vulnerability anything other than extreme (i.e. either low or increased, but not extreme), risk of harm is irrelevant
-    }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("GREEN") # technically personal data, low vulnerability, risk of harm is irrelevant
-    }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.0 & harmLvl() == "Yes") {
-      return("YELLOW") # technically personal data, increased and extreme vulnerability and increased risk of harm
-    }
-    if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.0 & harmLvl() == "No") {
-      return("GREEN") # technically personal data, increased and extreme vulnerability and no increased risk of harm
+    } else if ((maxX() >= 1.8 & maxX() < 3.0) & maxY() < 3.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      "YELLOW" # low risk indirectly identifiable (harder to reidentify), vulnerability anything other than extreme (i.e. either low or increased, but not extreme), risk of harm is irrelevant
+    } else if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.0 & harmLvl() == "Yes") {
+      "YELLOW" # technically personal data, increased and extreme vulnerability and increased risk of harm
+    } else if (maxX() < 1.8 & grnDatSum() > 0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      "GREEN" # technically personal data, low vulnerability, risk of harm is irrelevant
+    } else if (maxX() < 1.8 & grnDatSum() > 0 & maxY() >= 2.0 & harmLvl() == "No") {
+      "GREEN" # technically personal data, increased and extreme vulnerability and no increased risk of harm
       #-> potentially handle extreme vulernability separately here and consider as yellow even with no increased risk of harm; subject to debate and discussion
-    }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
-      return("BLUE") # not personal data, low vulernability, risk of harm is irrelevant
-    }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.0 & harmLvl() == "Yes") {
-      return("GREEN") # not personal data, increased and extreme vulnerability and increased risk of harm
+    } else if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.0 & harmLvl() == "Yes") {
+      "GREEN" # not personal data, increased and extreme vulnerability and increased risk of harm
       #-> could argue if not personal data, should not elevate, but risks of harm suggest need to be careful. May also want to consider handling extreme vulnerability PLUS increased risk of harm as YELLOW; subject to debate and discussion
-    }
-    if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.0 & harmLvl() == "No") {
-      return("BLUE")
+    } else if (maxX() < 1.8 & grnDatSum() == 0 & maxY() < 2.0 & (harmLvl() == "Yes"|harmLvl() == "No")) {
+      "BLUE" # not personal data, low vulernability, risk of harm is irrelevant
+    } else if (maxX() < 1.8 & grnDatSum() == 0 & maxY() >= 2.0 & harmLvl() == "No") {
+      "BLUE"
       # not personal data, increased and extreme vulnerability and NO increased risk of harm
       #-> could argue at least for extreme vulnerability to consider as GREEN; subject to debate and discussion
     }
-
+    
+  # then account for any answers to confidentiality questions that are not "No" to modify the base_colour to the final_colour
+    
+  final_colour <- base_colour
+    
+  if (confidRes() == "secret") {
+    final_colour <- "RED"
+  } else if (confidRes() == "at least 2"){
+    if (base_colour == "YELLOW") {
+      final_colour <- "ORANGE"
+    }
+    if (base_colour == "GREEN" | base_colour == "BLUE") {
+      final_colour <- "ORANGE"
+    }
+  } else if (confidRes() == "at least 1") {
+    if (base_colour == "YELLOW") {
+      final_colour <- "ORANGE"
+    }
+    if (base_colour == "GREEN" | base_colour == "BLUE") {
+      final_colour <- "YELLOW"
+    }
+  }
+  
+  #call return final_colour to set that colour to the rskCateg() reactive
+  
+  return(final_colour)
+  
   } 
   )
+  
   
   # create reactive based on color category called colorCat() to use in plot output
   
@@ -512,7 +669,118 @@ server <- function(input, output, session) {
       return("#6e99c4")
     }
   })
+  
+  # create reactive called rskCategLvl() to use as a translation/definition of the colour categories
+  # and to use in the data classification output
+  
+  rskCategLvl <- reactive({
+    if (rskCateg() == "RED") {
+      return("Very high")
+    }
+    if (rskCateg() == "ORANGE") {
+      return("High")
+    }
+    if (rskCateg() == "YELLOW") {
+      return("Medium")
+    }
+    if (rskCateg() == "GREEN") {
+      return("Medium to low")
+    }
+    if (rskCateg() == "BLUE") {
+      return("Low")
+    }
+  })
+  
+  # create reactive called confidResLvl to translate what the confidRes values mean into something understandable 
+  # for the user to read
+  
+  confidResLvl <- reactive({
+    if (confidRes() == "secret") {
+      return("very high because the data is secret (i.e. it poses risks to national security)")
+    }
+    if (confidRes() == "at least 2") {
+      return("elevated")
+    }
+    if (confidRes() == "at least 1") {
+      return("slightly elevated")
+    }
+    if (confidRes() == "none") {
+      return("not elevated")
+    }
+  })
 
+  # create reactive that summarizes in one variable all confidentiality questions with the answer "yes"
+  # text will be used in BIV export
+  
+  confidConc <- reactive({
+    
+    confidConc <- c()
+    if (confidRes() != "none") {
+      if (confidSecret() == "Yes") {
+        confidConc <- c(confidConc, "The data pose risk(s) to national security")
+      }
+      if (confidOblig() == "Yes") {
+        confidConc <- c(confidConc, "The data are subject to confidentiality obligations")
+      }
+      if (confidKnowlSec() == "Yes") {
+      confidConc <- c(confidConc, "The data contain unique knowledge, methods or algorithms")
+      }
+      if (confidIP() == "Yes") {
+        confidConc <- c(confidConc, "The data are potentially patentable or related to unpublished innovation(s)")
+      }
+      if (confidCommContr() == "Yes") {
+        confidConc <- c(confidConc, "The data are subject to commercial contracts")
+      }
+      if (confidCommVal() == "Yes") {
+        confidConc <- c(confidConc, "The data are commercially valuable")
+      } 
+    } else {
+      confidConc <- c(confidConc, "None")
+    }
+    return(confidConc)
+  }
+  )
+  
+  # create a reactive that identifies which data processing activities were chosen by user
+  # text will be used in BIV export
+  
+  datProc <- reactive({
+    req(input$datActiv)
+    
+    datProc <- input$datActiv
+    
+  })
+  
+  datProcDefn <- reactive({
+    datProcDefn <- datProc()
+    datProcDefn <- str_replace(datProcDefn, "storage", "Data storage during active research")
+    datProcDefn <- str_replace(datProcDefn, "transfer", "Data transfer to research collaborators")
+    datProcDefn <- str_replace(datProcDefn, "students", "Data use by students")
+    datProcDefn <- str_replace(datProcDefn, "archiving", "Data archiving and publishing after active research")
+    datProcDefn <- str_replace(datProcDefn, "reuse", "Data reuse after active research")
+  })
+  
+  
+  # create a reactive that identifies when all required input fields are filled (esp when those fields are used with the req call within a reactive)
+  # so that this individual reactive can be used to determine when the app is ready for the final output or for the export etc (to prevent
+  # early or unnecessary results displaying or downloading or whatever else gets added)
+  # note that technically only dataType and particType need to be checked for input in the current iteration (v1.0) and not the radio
+  # button inputs, but this allows protection if the radio buttons ever get changed to something requiring user input
+  
+  is_ready <- reactive({
+    # List the core text inputs
+    required_inputs <- c("dataType", "particType")
+    
+    # List radio buttons
+    radio_inputs <- c(
+      "harmLvl", "confidSecret", "confidOblig", "confidKnowlSec", 
+      "confidIP", "confidCommContr", "confidCommVal"
+    )
+    
+    # Check if EVERY input in both lists is 'truthy'
+    all(sapply(c(required_inputs, radio_inputs), function(x) isTruthy(input[[x]])))
+  })
+  
   
   ### ACTION BUTTONS
   
@@ -578,6 +846,7 @@ server <- function(input, output, session) {
   observeEvent(input$view, {
     # input validation for these fields is only enabled upon clicking view
     iv$enable()
+    
     # this action also causes the reactive Value reset$clear to become 1 (and therefore not NA)
     reset$clear <- 1
   })
@@ -609,6 +878,12 @@ server <- function(input, output, session) {
     updateSelectInput(inputId = "adultChild", selected=character(0))
     updateSelectInput(inputId = "particType", selected=character(0))
     updateSelectInput(inputId = "harmLvl", selected="No")
+    updateSelectInput(inputId = "confidCommVal", selected="No")
+    updateSelectInput(inputId = "confidOblig", selected="No")
+    updateSelectInput(inputId = "confidKnowlSec", selected="No")
+    updateSelectInput(inputId = "confidIP", selected="No")
+    updateSelectInput(inputId = "confidCommContr", selected="No")
+    updateSelectInput(inputId = "confidSecret", selected="No")
     updateSelectInput(inputId = "datActiv", selected=c("storage","transfer","students","archiving","reuse"))
     reset$clear <- NA
     
@@ -618,6 +893,27 @@ server <- function(input, output, session) {
   
   #### OUTPUTS
   
+  # create reactive for plot so that can also use in downloadHandler as a png in the exported report
+  
+  XYplot <-  reactive({
+    ggplot(xyPair(), aes(x = maxX, y = maxY)) +
+    geom_point(size = 15, color = "black", fill = colorCat(), shape = 21) +
+    scale_x_continuous(name = "Re-identifiability risk", 
+                       breaks = c(1,3,5),
+                       labels = c("1" = "Low risk", "3" = "Moderate risk",  "5" = "High risk"),
+                       limits = c(1, 5)) +
+    scale_y_continuous(name = "Participant vulnerability risk", 
+                       breaks = c(1,  2.25,  3.5),
+                       labels = c("1.0" = "Low risk",  "2.25" = "Moderate risk",  "3.5" = "High risk"),
+                       limits = c(1, 3.5)) +
+    theme(axis.text.x=element_text(size=15),
+          axis.text.y=element_text(size=15, angle = 90, hjust = 0.6),
+          #axis.ticks = element_blank(),
+          axis.title=element_text(size=24,face="bold")
+    ) 
+  }
+  )
+  
   # plot output of overall results
   
   output$XYplot <- renderPlot({
@@ -625,21 +921,7 @@ server <- function(input, output, session) {
     # then no output will be returned. If anything else, the plot will be returned
     if (is.na(reset$clear)) return()
     
-    ggplot(xyPair(), aes(x = maxX, y = maxY)) +
-      geom_point(size = 15, color = "black", fill = colorCat(), shape = 21) +
-      scale_x_continuous(name = "Re-identifiability risk", 
-                         breaks = c(1,3,5),
-                         labels = c("1" = "Low risk", "3" = "Moderate risk",  "5" = "High risk"),
-                         limits = c(1, 5)) +
-      scale_y_continuous(name = "Participant vulnerability risk", 
-                         breaks = c(1,  2.25,  3.5),
-                         labels = c("1.0" = "Low risk",  "2.25" = "Moderate risk",  "3.5" = "High risk"),
-                         limits = c(1, 3.5)) +
-      theme(axis.text.x=element_text(size=15),
-            axis.text.y=element_text(size=15, angle = 90, hjust = 0.6),
-            #axis.ticks = element_blank(),
-            axis.title=element_text(size=24,face="bold")
-            ) 
+   return(XYplot())
     
   })
   
@@ -658,31 +940,50 @@ server <- function(input, output, session) {
       harmTxt <- "are no"
     }
     
-    HTML(paste0("Your data risk classification is ", strong(rskCateg()), 
-          ". You have indicated that there ",  strong(harmTxt), " increased risks of
-          harm to your participants."),
-
-         # for app testing it is also helpful to be able to temporarily view the maxX and maxY
-         # below can be commented in or out depending on need for testing
-         #paste(strong("Re-identification risk is", maxX(), "and vulnerability risk is",  maxY()))
-         )
-
+    if (rskCateg() == "RED") {
+      contactTxt <- span(# use span() and html tags to include a hyperlink and other formatting within the text of contactTxt
+        " - contact ", 
+        tags$a(href = "mailto:research.data.fgb@vu.nl", "research.data.fgb@vu.nl"), 
+        " to inform the FGB REPS team that you will be working with ",
+        tags$strong("very high risk data")
+      )
+    } else {
+      contactTxt <- NULL 
+    }
     
-  }
-  
+    # create unordered list of results in text form. Use tags to create correct html tags via R
+    
+    tags$ul(
+      tags$li(
+        "Your data risk classification is ", strong(rskCateg()), 
+        " which means your risk level is ", strong(tolower(rskCategLvl())),
+        contactTxt
+      ),
+      tags$li(
+        "You have indicated that there ",  strong(harmTxt), 
+          " increased risks of harm to your research subjects"
+      ),
+      tags$li(
+        "You have indicated that the confidentiality risks (addressed in the additional questions on confidentiality) are ",
+        strong(confidResLvl())
+      )
+      # optional line for testing e.g. when need to see maxX and maxY values or other info not relevant to final app
+      # , tags$li(strong("Re-identification risk is", maxX(), "and vulnerability risk is",  maxY()))
+      
+    )
+    
+    }
   )
+  
+  # once results have been generated enable the downloadTrigger button 
+  
+  observe({
+    shinyjs::toggleState("downloadTrigger", condition = is_ready())
+  })
+  
   
   
   # make output for recommendations text on the second tab of UI
-  
-  # first create a reactive that identifies which data processing activities were chosen by user
-  
-  datProc <- reactive({
-    req(input$datActiv)
-    
-    datProc <- input$datActiv
-    
-  })
   
   # set up action button shwYelReus that only appears if rskCateg is GREEN and datProc is "reuse"
   
@@ -694,11 +995,25 @@ server <- function(input, output, session) {
   # allow shwYelReus action button to be seen
   
   observe({
-    if (rskCateg()=="GREEN" & "reuse" %in% datProc() & is.na(show$yellow)) {
-      shinyjs::show(id = "shwYelReus")
-    } 
-  }
-  )
+    # 1. Use is_ready reactive to test that all required fields are complete
+    ready <- is_ready()
+    
+    # 2. check conditions of whether rskCateg is green and datProc includes data reuse
+    is_green  <- ready && rskCateg() == "GREEN"
+    has_reuse <- ready && "reuse" %in% input$datActiv
+    
+    if (is_green && has_reuse) {
+      if (is.na(show$yellow)) {
+        shinyjs::show("shwYelReus")
+      } else {
+        shinyjs::hide("shwYelReus")
+      }
+    } else {
+      # This block now ALWAYS runs if inputs are cleared!
+      shinyjs::hide("shwYelReus")
+      show$yellow <- NA 
+    }
+  })
   
   # on click of shwYelReus show$yellow reactive value becomes 1 which will impact the chosen markdown
   # outputs in the following renderUI section
@@ -710,23 +1025,20 @@ server <- function(input, output, session) {
     
   })
   
-  # return show$yellow to NA and hide action button shwYelReus again if reuse is deselected or data is no longer GREEN
-  
-  observe({
-    if (rskCateg()!="GREEN" | !("reuse" %in% datProc())) {
-      show$yellow <- NA
-      shinyjs::hide(id = "shwYelReus")
-    } 
-  }
-  )
-  
   # based on datProc as well as rskCateg calculations, concat recommendations text and render into UI
   # if the action button shwYelReus has been clicked and the rskCateg is GREEN the first action will carry out
   # and include the yellow reuse instructions. For all other cases, the recommendations will simply be
   # combined based on rskCateg color and which datProc activities are currently selected by the user
   
   combineMD <- reactive({
-    if (!is.na(show$yellow)) {
+    if (isTruthy(input$datActiv)) {
+      if (rskCateg() == "RED") {
+        combineMD <- c(readLines("mdFiles/genRecRED.Rmd")) #read in Rmd that provides the yaml and css at very top & Rmd that gives general guidance
+        for(i in 1:length(datProc())) {
+          mdFile <- paste0("mdFiles/",datProc()[i],rskCateg(), ".Rmd")
+          combineMD <- c(combineMD, readLines(mdFile))
+        }
+      } else if (!is.na(show$yellow)) {
       combineMD <- c(readLines("mdFiles/genRec.Rmd")) #read in Rmd that provides the yaml and css at very top & Rmd that gives general guidance
       for(i in 1:length(datProc())) {
         mdFile <- paste0("mdFiles/",datProc()[i],rskCateg(), ".Rmd")
@@ -739,6 +1051,11 @@ server <- function(input, output, session) {
         mdFile <- paste0("mdFiles/",datProc()[i],rskCateg(), ".Rmd")
         combineMD <- c(combineMD, readLines(mdFile))
       }
+      }
+    } else if (rskCateg() == "RED") {
+      combineMD <- c(readLines("mdFiles/genRecRED.Rmd"))
+    } else {
+      combineMD <- c(readLines("mdFiles/genRec.Rmd"))
     }
     
     writeLines(combineMD, "mdFiles/combinedRec.Rmd")
@@ -803,9 +1120,111 @@ server <- function(input, output, session) {
     }
   )
   
-  # SAVE USER INPUT
+  # save user input so that it doesn't disappear on refresh
+  # uses shinyStorePlus package https://github.com/oobianom/shinyStorePlus
   appid <- "app666" # id doesn't matter too much AFAIK
-  setupStorage(appId = appid, inputs = TRUE)
+  setupStorage(appId = appid, inputs = TRUE) 
+  
+  
+  
+  # set up downloadHandler 
+  # and connect to download button
+  # to generate BIV report from user input on request
+  
+  # 1. create a modal that pops up with a message when downloadTrigger is clicked
+  
+  observeEvent(input$downloadTrigger, {
+    
+    # Disable while download happens so that user cannot repeatedly click if download is slow
+    shinyjs::disable("downloadTrigger")
+
+    # show modal message
+    showModal(modalDialog(
+      title = "Downloading data classification",
+      p("Please wait while your data classification is downloaded"),
+      p("Once complete, review your classification and fill in any fields not addressed by this tool"),
+      p("Also, review the sections in your classification on 'Availability' and 'Integrity' to determine if your situation 
+        deviates from the default"),
+      easyClose = TRUE,
+      footer = modalButton("Close")
+    ))
+    
+    # trigger hidden download button using JavaScript
+    # This 'clicks' the hidden button for the user
+    delay(50, shinyjs::click("downloadHidden"))
+    
+    # Re-enable button once download is complete
+    shinyjs::enable("downloadTrigger")
+
+  })
+  
+  
+  # 3. results of the downloadHidden button being clicked behind the scenes
+  
+  output$downloadHidden <- downloadHandler(
+    filename = function() {
+      paste0("biv_", format(Sys.time(), '%Y%m%d_%H%M%S'), '.docx')
+    },
+    content = function(file) {
+      
+
+      # only generate plot for export if it exists
+      if (isTruthy(input$dataType) && isTruthy(input$particType)) {
+        # adjust plot settings for word export
+      
+        current_plot <- XYplot() + 
+          theme(axis.text.x=element_text(size=12),
+              axis.text.y=element_text(size=12, angle = 90, hjust = 0.6),
+              axis.title=element_text(size=18,face="bold")
+          )
+      
+        # adjust size of point on plot (need to do with following to adjust existing ggplot layer
+        # rather than just creating a new layer on top)
+      
+        current_plot$layers[[1]]$aes_params$size <- 8
+      
+        # create a temp path for saving XYplot as a PNG
+        plot_path <- file.path(tempdir(), "temp_user_plot.png")
+        # Save it to the temp path
+        ggsave(plot_path, plot = current_plot, device = "png")
+      
+      } else {
+        plot_path <- file.path(tempdir(), "blank.png")
+        file.copy(normalizePath("img/blank.png"), plot_path, overwrite = TRUE)
+      }
+      
+      # Copy the template to a temp directory to avoid permission issues
+      tempReport <- file.path(tempdir(), "templateBIV.Rmd")
+      file.copy("mdFiles/templateBIV.Rmd", tempReport, overwrite = TRUE)
+      
+      # Also copy the style template to the tempdir so that it can be read during render
+      tempStyle <- file.path(tempdir(), "style_template.docx")
+      file.copy("mdFiles/style_template.docx", tempStyle, overwrite = TRUE)
+      
+      
+      
+      
+      # Knit the document and pass Shiny inputs to RMarkdown params
+      rmarkdown::render(
+        input = tempReport,
+        output_file = file,
+        params = list(
+          data_types = if(isTruthy(input$dataType)) input$dataType else "\\<describe data types collected and used\\>",
+          partic_types = if(isTruthy(input$particType)) input$particType else "\\<describe the research subjects whose data will be used\\>",
+          extra_harm = input$harmLvl,
+          data_proc = if (isTruthy(input$datActiv)) datProcDefn() else "\\<describe the data processing activities planned\\>",
+          risk_categ = if (isTruthy(input$dataType) && isTruthy(input$particType)) rskCategLvl() else "NA",
+          plot_output = plot_path,
+          confid_conc = confidConc()
+        ),
+        output_options = list(reference_docx = tempStyle), # ensures that render can find the reference style document
+        envir = new.env(parent = globalenv())
+      )
+    }
+    
+  )
+  
+  
   
 }
 

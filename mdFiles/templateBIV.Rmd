@@ -1,0 +1,124 @@
+---
+title: "Confidentiality, Integrity & Availability (CIA) classification for research data"
+output:  word_document
+params:
+  data_types: ""
+  partic_types: ""
+  extra_harm: ""
+  data_proc: ""
+  risk_categ: ""
+  plot_output: ""
+  confid_conc: ""
+---
+
+```{r, echo=FALSE}
+# for formatting parameterized text if only the default text is entered because there is no user input
+format_text <- function(val) {
+  # all default text starts with "\\<describe " so identify if that is present at all in the parameterized input
+  if (sum(grep("\\<describe ", val))>0) {
+    return(paste0("*", val, "*"))
+  } else {
+    # Otherwise, return it as plain text
+    return(val)
+  }
+}
+```
+
+This form classifies the availability, integrity, and confidentiality needs of data processed during the research process. This form is not intended for the purpose of classifying any systems or process and is only appropriate for research data. If you wish to classify a system or process, please contact: [IT-security](https://services.vu.nl/esc). 
+
+The principal investigator (PI) or a designated member of the research team is responsible for filling in the form with accuracy and transparency. Once completed, the form should be sent to the faculty [Privacy Champion](https://vu.nl/en/employee/privacy-and-information-security/privacy-champions-information) for review before it is submitted to [IT-security](https://services.vu.nl/esc) for any additional feedback and archiving. 
+
+If you have any questions, please contact [IT-security](https://services.vu.nl/esc). 
+
+
+## Project Background
+
+### Description of project:
+
+<*brief overview of project, goals, timeline, etc...*>
+
+### Description of data:
+
+#### Data types collected
+
+`r format_text(params$data_types)`
+
+#### Research subjects studied
+
+`r format_text(params$partic_types)`
+
+#### Additional risk of harm
+
+Does the information contained in the data pose additional risks of harm to the research subjects?
+
+`r params$extra_harm`
+
+### Description of data processing
+
+#### General data processing activities
+
+`r format_text(params$data_proc)`
+
+#### Specific data processing activities
+
+<*describe how data will be obtained (collected/shared), what tools will be used to collect/ process data, the data flow, workstations (devices) that will be used, retention periods, legal grounds for processing*>
+
+
+### Description of involved parties
+
+<*list all parties involved in the data processing, examples: Research team, collaborators, 3rd party tools, sub processors, etc...*>
+
+------------------------------
+
+## Availability
+
+**Availability** is understood as: ensuring that authorized users have timely access to data and related facilities at the right times. This indicates to what extent loss or temporary unavailability of research data is acceptable for the organization and the research. Elements that determine availability are, for example, a reliable power supply, reliable backups, the exclusion of so-called 'single points of failure' and the existence of sufficient access options for the intended number of simultaneous users to be expected. 
+
+Research data can withstand a maximum downtime present in M-classification, unexpected downtime will impact the project's progress but should not cause substantial damage to the university or the research project. If such a risk is present, an argument can be made to heighten the availability classification. 
+
+The assumption that M classification is prescribed unless one of the following criteria are met:
+
+* Data is necessary for a real-time decision-making process’ which impacts the university, or participants directly (e.g., life critical systems);
+* Data which is used to directly impact real world processes (e.g., public services/ infrastructure);
+* Unique data which cannot be reproduced (time/ situation constraints).
+  
+If any of the following criteria are met, please contact [IT-security](https://services.vu.nl/esc) to discuss your case further.
+
+---------------------------------
+
+## Integrity
+
+**Integrity** is understood as: ensuring the correctness and completeness of data and processing. To what extent is the information in accordance with reality (correct, complete and up to date)? Preventing risks to the integrity of research data are, for example, only being able to make changes by authorized persons, registering changes, protecting data during transport. 
+
+Minimal errors are acceptable and have minimal negative impact on research objectives, safety, budget or reputation. Version control is accepted as a suitable measure to mitigate integrity risks in research data in standard research projects.
+
+The assumption that M classification is prescribed unless one of the following criteria are met:
+
+* Errors in data can lead to safety risk of participants/ researchers;
+* Errors in data can lead to significant financial or reputational risk to the university or researchers.
+
+--------------------------------
+
+## Confidentiality
+
+**Confidentiality** is understood as ensuring that data is only accessible to those who are authorized to do so. To what extent is the data accessible and under what conditions. Measures to protect the confidentiality of data include, for example, encrypting information and authenticating the user as soon as he or she wants to access the data.
+Instructions: based on the data collected for your project, answer the following questions. The goal of these questions is to determine the level of confidentiality required for your data. Provide an explanation for each of the questions. In the comments, you will find further explanations. The questions should be used to guide you when considering the impacts of your data.  
+
+
+### Confidentiality classification
+
+**Risk level**: `r params$risk_categ`
+
+**Privacy matrix (if applicable)**: 
+
+```{r, echo=FALSE} 
+
+
+  knitr::include_graphics(params$plot_output)
+
+
+```
+
+**Additional confidentiality concerns**:
+
+`r params$confid_conc`

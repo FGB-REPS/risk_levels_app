@@ -36,9 +36,18 @@ When contemplating risk of harm, consider whether the information or subject mat
 
 The default for risk of harm is set to "No", but you can adjust this to "Yes" if the content of your data elevate the risks of harm. For certain research subject populations that belong to highly stigmatized or marginalized groups, the risk of harm will automatically switch to a default of "Yes". In such a case, you can return the risk of harm to "No" if in your estimation the risks posed by the data to the research population are not elevated. You can also discuss this further with the [FGB Privacy Officer](mailto:research.data.fgb@vu.nl) if you are unsure.
 
+### Confidentiality concerns
+
+[Confidentiality](https://fgb-rdm.nl/Security/PrivacyRisks.html#confidentiality){target="_blank"} is a concept that overlaps with privacy, but there can be cases where privacy risks are low, but confidentiality is still a concern. The additional confidentiality questions posed address these types of situations. If you are unsure how to answer these questions, contact the [FGB REPS team](mailto:research.data.fgb@vu.nl).
+
 ### Data processing activities
 
 The default setting for the tool is to account for all possible data processing activities. If all options are selected, you will be given advice based on the risk assessment for all of the possible data processing activities where specific advice on data risks is necessary to help you make choices to protect participants' privacy and ensure security is maintained. However, if you only want recommendations for some data processing activities, for example, if you want to investigate data storage because you want to see what the recommendations will be for certain combinations of data types and participant types, then you can select the data processing activities that you are interesting in and that applies to the data & participant types you've entered into the tool.
+
+
+### Classification download
+
+You can use this tool to export a preliminary version of a data classification document. Data classifications are often requested by the IT Security team when their expertise is called upon (e.g. setting up a processing agreement with a new data processor, assessing what additional measures are needed to protect very high risk data, advising on the appropriateness of existing tools for certain types of data etc). The export created with the "download classification" button uses your input in this tool to fill in a data classification template as much as possible. Once you have the data classification export, fill in any sections that are not addressed by this tool and review the sections on *Availability* and *Integrity* to check if your research falls outside that norm for these two topics (most research has medium risks for Availability and Integrity, as described in the data classification export).
 
 ### Support
 
