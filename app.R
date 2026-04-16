@@ -1058,7 +1058,12 @@ server <- function(input, output, session) {
       combineMD <- c(readLines("mdFiles/genRec.Rmd"))
     }
     
-    writeLines(combineMD, "mdFiles/combinedRec.Rmd")
+    
+    # Copy to a temp directory to avoid issues with multiple users working with the app at the same time
+    tempRecRMD <- file.path(tempdir(), "combinedRec.Rmd")
+    tempRecHTML <- file.path(tempdir(), "combinedRec.html")
+    
+    writeLines(combineMD, tempRecRMD)
     
     # originally rendered Rmd to markdown but changed to rendering to html below
     # just need to ensure that markdownToHTML command includes template = FALSE to not
@@ -1069,8 +1074,8 @@ server <- function(input, output, session) {
       #                     output_dir ='mdFiles', 
        #                    quiet = TRUE))
     
-    HTML(markdown::markdownToHTML(knit('mdFiles/combinedRec.Rmd', 
-                                       output ='mdFiles/combinedRec.html',
+    HTML(markdown::markdownToHTML(knit(tempRecRMD, 
+                                       output = tempRecHTML,
                                        quiet = TRUE),
                                       template = FALSE ))
     
