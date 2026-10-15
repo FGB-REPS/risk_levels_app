@@ -337,9 +337,12 @@ ui <- page_sidebar(
     # panel for specific recommendations on storage, data sharing etc
     nav_panel(
       "Risk level recommendations",
+      # button for downloading recommendation output; not doing same as other download button because no modal necessary
+      # button shown when results shown
+      shinyjs::hidden(downloadButton("downloadReccs", "Download recommendations", class="btn btn-primary")),
       uiOutput("recommendations") %>% withSpinner(type = getOption("spinner.type", default = 5),
                                                   color = getOption("spinner.color", default = "#2da4e7")),
-      shinyjs::hidden(actionButton("shwYelReus", "Show reuse of yellow data", class="btn-outline-primary"))
+      shinyjs::hidden(actionButton("shwYelReus", "Show reuse guidance on yellow data", class="btn-outline-primary"))
     ),
     # panel for instructions on how to use the tool (if needed)
     nav_panel(
@@ -975,16 +978,13 @@ server <- function(input, output, session) {
     }
   )
   
-  # once results have been generated enable the downloadTrigger button 
-  
+  # once results have been generated enable the downloadTrigger button for BIV download
+
   observe({
     shinyjs::toggleState("downloadTrigger", condition = is_ready())
   })
   
-  
-  
   # make output for recommendations text on the second tab of UI
-  
   # set up action button shwYelReus that only appears if rskCateg is GREEN and datProc is "reuse"
   
   # first create reactive value show$yellow that will always be NA except for the conditions when
@@ -995,8 +995,10 @@ server <- function(input, output, session) {
   # allow shwYelReus action button to be seen
   
   observe({
-    # 1. Use is_ready reactive to test that all required fields are complete
-    ready <- is_ready()
+    # 1. Use is_ready reactive to test that all required fields are complete and 
+    # also check if reset$clear is na. If not then the results are showing and if the
+    # results are showing, we can display the shwYelReus button
+    ready <- !is.na(reset$clear) && is_ready()
     
     # 2. check conditions of whether rskCateg is green and datProc includes data reuse
     is_green  <- ready && rskCateg() == "GREEN"
@@ -1065,14 +1067,9 @@ server <- function(input, output, session) {
     
     writeLines(combineMD, tempRecRMD)
     
-    # originally rendered Rmd to markdown but changed to rendering to html below
+    # rendering to html
     # just need to ensure that markdownToHTML command includes template = FALSE to not
     # mess up formatting
-    
-    #includeMarkdown(render("mdFiles/combinedRec.Rmd", 
-     #                      output_file = 'combinedRec', 
-      #                     output_dir ='mdFiles', 
-       #                    quiet = TRUE))
     
     HTML(markdown::markdownToHTML(knit(tempRecRMD, 
                                        output = tempRecHTML,
@@ -1080,6 +1077,9 @@ server <- function(input, output, session) {
                                       template = FALSE ))
     
   })
+  
+
+  
   
   output$recommendations <- renderUI({
     # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
@@ -1090,7 +1090,64 @@ server <- function(input, output, session) {
   
     })
   
+  # display downloadReccs button for recommendation download when combineMD exists
+  
+  observe({
+    
+    # identify if combineMD exists and is ready to be downloaded
+    # if reactive value reset$clear is NA (only upon initial session or after action button reset is clicked)
+    # and all required fields have been filled in (detected with is_ready) then canDownload is true
+    canDownload <- is_ready() && !is.na(reset$clear)
+    
+    if (canDownload) {
+      shinyjs::show("downloadReccs")
+    } else {
+      shinyjs::hide("downloadReccs")
+    }
+  })
+  
+  # download recommendations presented with downloadReccs button
+  output$downloadReccs <- downloadHandler(
+    filename = function() {
+      paste0("risk_recommendations_", format(Sys.time(), '%Y%m%d_%H%M%S'), '.docx')
+    },
+    content = function(file) {
+      
+      # 1. "Secretly" trigger the yellow reuse inclusion for the download 
+      # if the conditions are met (even if show yellow button not clicked in UI)
+      if (rskCateg() == "GREEN" && "reuse" %in% datProc()) {
+        show$yellow <- 1
+        }
 
+      combineMD()
+      
+      
+      tempReccs <- file.path(tempdir(), "combinedRec.Rmd")
+      
+      # Also copy the style template to the tempdir so that it can be read during render
+      tempStyle <- file.path(tempdir(), "style_template.docx")
+      file.copy("mdFiles/style_template.docx", tempStyle, overwrite = TRUE)
+
+      
+      # Knit the document as a word doc
+      rmarkdown::render(
+        input = tempReccs,
+        output_file = file,
+        output_options = list(reference_docx = tempStyle), # ensures that render can find the reference style document
+        envir = new.env(parent = globalenv())
+      )
+      
+      # reset show yellow if applicable
+      
+      show$yellow <- NA
+      
+    }
+    
+    
+  )
+  
+  
+  
   
   # render instructions.Rmd to md and convert to an output that can be presented in the "How to use this tool" tab of the UI
   
@@ -1164,7 +1221,7 @@ server <- function(input, output, session) {
   })
   
   
-  # 3. results of the downloadHidden button being clicked behind the scenes
+  # 2. results of the downloadHidden button being clicked behind the scenes
   
   output$downloadHidden <- downloadHandler(
     filename = function() {

@@ -23,7 +23,7 @@ Green data are low-risk, but still considered personal data under the GDPR. This
 
 ## Additional considerations
 
-The procedures described above for reuse of green data are fairly new and require that you have appropriately obtained consent to sharing the green data openly and publicly. If that was not done, it is advisable to follow the guidance on reusing *yellow* data after research. If you wish to review that guidance, click the following button:
+The procedures described above for reuse of green data are fairly new and require that you have appropriately obtained consent to sharing the green data openly and publicly. If that was not done, it is advisable to follow the guidance on reusing *yellow* data after research.
 
 ------------------------------------------------------------------------
 
